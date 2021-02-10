@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.hrptech.expensemanager.ui.home.HomeFragment"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/nav_category"
+        android:name="com.hrptech.expensemanager.ui.category.CategoryActivity"
+        android:label="@string/menu_category"
+        tools:layout="@layout/fragment_category" />
+
+    <fragment
+        android:id="@+id/nav_budget"
+        android:name="com.hrptech.expensemanager.ui.budget.BudgetFragment"
+        android:label="@string/menu_budget"
+        tools:layout="@layout/fragment_budget" />
+
+    <fragment
+        android:id="@+id/nav_transport"
+        android:name="com.hrptech.expensemanager.ui.transaction.TransactionFragment"
+        android:label="@string/menu_transaction"
+        tools:layout="@layout/fragment_transaction" />
+
+    <fragment
+        android:id="@+id/nav_report"
+        android:name="com.hrptech.expensemanager.ui.report.ReportFragment"
+        android:label="@string/menu_report"
+        tools:layout="@layout/fragment_report" />
+
+    <fragment
+        android:id="@+id/nav_backup"
+        android:name="com.hrptech.expensemanager.ui.backup.BackupRestoreFragment"
+        android:label="@string/menu_backuprestore"
+        tools:layout="@layout/fragment_backupandrestore" />
+
+    <fragment
+        android:id="@+id/nav_webserver"
+        android:name="com.hrptech.expensemanager.ui.webserver.WebServerFragment"
+        android:label="Web Server"
+        tools:layout="@layout/fragment_webserver" />
+
+    <fragment
+        android:id="@+id/nav_rating"
+        android:name="com.hrptech.expensemanager.ui.report.ReportFragment"
+        android:label="@string/menu_report"
+        tools:layout="@layout/fragment_report" />
+
+
+
+
+</navigation>

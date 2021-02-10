@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "1005143157154",
+    "firebase_url": "https://expensemanager-bb35b-default-rtdb.firebaseio.com",
+    "project_id": "expensemanager-bb35b",
+    "storage_bucket": "expensemanager-bb35b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1005143157154:android:6ccfea6a809df51b302afb",
+        "android_client_info": {
+          "package_name": "com.firebasedbexamples"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1005143157154-dag3af8hq471ifnekkc205kiveqjhotb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLLTFK7CnYc9rmmR4B89Q6TyZrGrtG1wQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1005143157154-dag3af8hq471ifnekkc205kiveqjhotb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1005143157154:android:de20eddc997b78e4302afb",
+        "android_client_info": {
+          "package_name": "com.hrptech.expensemanager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1005143157154-dag3af8hq471ifnekkc205kiveqjhotb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLLTFK7CnYc9rmmR4B89Q6TyZrGrtG1wQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1005143157154-dag3af8hq471ifnekkc205kiveqjhotb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

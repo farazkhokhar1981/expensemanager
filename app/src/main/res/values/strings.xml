@@ -1,0 +1,168 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Expense Manager and Budget Planner</string>
+    <string name="app_name2">Expense Manager and\n Budget Planner</string>
+    <string name="version">Version 1.1.0</string>
+    <string name="action_settings">Settings</string>
+    <string name="cancel">Cancel</string>
+    <string name="menu_home">Dashboard</string>
+    <string name="menu_category">Add Categories</string>
+    <string name="menu_transaction">Transaction Form</string>
+    <string name="menu_backuprestore">Backup and Restore</string>
+    <string name="menu_report">Report</string>
+    <string name="menu_budget">Budget Entry Form</string>
+    <string name="menu_web">Web Server</string>
+    <string name="menu_more">More Apps</string>
+    <string name="dailytransaction">Daily Transaction</string>
+    <string name="monthlytransaction">Monthly Transaction</string>
+    <string name="yeartransaction">Yearly Transaction</string>
+    <string name="budget">Budget</string>
+    <string name="chart">Chart</string>
+    <string name="income">Income</string>
+    <string name="expense">Expense</string>
+    <string name="Category">Category</string>
+    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-6624065608358661/5619802231</string>
+<!--    ca-app-pub-6624065608358661/5619802231</string>-->
+    <string name="interstitial_full_screen" translatable="false">ca-app-pub-6624065608358661/3943758487</string>
+<!--    ca-app-pub-6624065608358661/3943758487</string>-->
+    <string name="year_prompt">Choose a country</string>
+    <string name="report_prompt">Choose a report</string>
+    <string name="transaction_menu">Add Transaction</string>
+    <string name="ad_attribution">Ad</string>
+    <string name="dashboard_menu">Home</string>
+    <string name="more">More</string>
+    <string name="all">All</string>
+    <string name="add_income">Add Income</string>
+    <string name="add_expense">Add Expense</string>
+    <string name="account_modification">Modification</string>
+    <string name="inactive_customer">Deactive Category</string>
+    <string name="report_menu">Report</string>
+    <string name="backupAndRestore">Expense Manager and Budget Planner Add Category and Daily Transaction</string>
+    <string name="backup_restore_menu">Backup and Restore</string>
+    <string name="backup_restore_menu1">Backup and Restore</string>
+    <string name="select_language">Select Lanaguage</string>
+    <string name="howtoplay">How To Use?</string>
+    <string name="banner">BANNER</string>
+    <string name="account_documents">PDF Documents</string>
+    <string name="menu_feedback">Feedback</string>
+    <string name="menu_share">Share App</string>
+    <string name="contactus">Contact us</string>
+    <string name="select_settings"></string>
+    <string name="quit">Quit</string>
+    <string name="select_company">Accounts Group</string>
+    <string name="total_customer">Total Accounts</string>
+    <string-array name="report_arrays">
+        <item>To dates Detail Report</item>
+        <item>To dates Summary Report</item>
+        <item>Yearly Report</item>
+        <item>To dates Category Detail Report</item>
+        <item>To dates Category Summary Report</item>
+        <item>Yearly Category Report</item>
+    </string-array>
+
+    <string-array name="currency_arrays">
+        <item>Dollar ($)</item>
+        <item>Euro (€)</item>
+        <item>Pound (£)</item>
+    </string-array>
+
+    <string-array name="dateformat_arrays">
+        <item>yyyy-MM-dd (2021-05-01)</item>
+        <item>dd-MM-yyyy (01-05-2021)</item>
+        <item>dd-M-yyyy hh:mm:ss (02-1-2021 06:07:59)</item>
+        <item>dd MMMM yyyy (02 January 2021)</item>
+        <item>E, dd MMM yyyy HH:mm:ss z (Tue, 02 Jan 2018 18:07:59 IST)</item>
+    </string-array>
+    <string name="company_name">Company Name</string>
+    <string name="S_No" />
+    <string name="Description" />
+    <string name="debit" />
+    <string name="credit" />
+    <string name="balance" >Balance</string>
+    <string name="have_you_scure">Have you secured your data?</string>
+    <string name="secure_your_database">Backup Now</string>
+    <string name="confirmDeleteRec">Do You Want Delete Record?</string>
+    <string name="confirmUpdateRec">Do You Want Update Record?</string>
+    <string name="confirm">Do You Want to Exit?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="confirmDelete">Do You Want to Pdf?</string>
+    <string name="contactus_msg">If you have problem about Expense Manager and Budget Planner app then contact us.</string>
+    <string name="for_call">For Call</string>
+    <string name="for_sms">For SMS</string>
+    <string name="for_whatsapp">For Whatsapp</string>
+    <string name="introduction">Expense Manager and Budget Planner Home Screen and app Intro</string>
+    <string name="how_wecreate_company">Expense Manager and Budget Planner Home Screen and app Web Server and Report Intro</string>
+    <string name="how_create_customer">How we set Budget?</string>
+    <string name="how_create_income">How we add Income?</string>
+    <string name="how_create_expense">How we add Expense?</string>
+    <string name="how_create_reports">How we create reports?</string>
+    <string name="norecorddocumentattached_found">No Documents Found</string>
+    <string name="transaction_no">Transaction No.</string>
+    <string name="customer_name">Customer Name</string>
+    <string name="transaction_date">Date</string>
+    <string name="transaction_amount">Amount</string>
+    <string name="transaction_Description">Description</string>
+    <string name="transaction_debit">You Give</string>
+    <string name="transaction_credit">You Take</string>
+    <string name="voucherdetail" >Voucher Detail</string>
+    <string name="customer_contact">Customer Contact</string>
+    <string name="month_prompt">Customer Contact</string>
+    <string name="nav_header_desc">Customer Contact</string>
+    <string name="lastpayment">Last Payment</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="notification">Notification</string>
+    <string name="add_category">Add Category</string>
+    <string name="currency">Currency</string>
+    <string name="dateformat">Date Format</string>
+    <string name="save">Save</string>
+
+    <string-array name="year_arrays">
+        <item>2009</item>
+        <item>2010</item>
+        <item>2011</item>
+        <item>2012</item>
+        <item>2013</item>
+        <item>2014</item>
+        <item>2015</item>
+        <item>2016</item>
+        <item>2017</item>
+        <item>2018</item>
+        <item>2019</item>
+        <item>2020</item>
+        <item>2021</item>
+        <item>2022</item>
+        <item>2023</item>
+        <item>2024</item>
+        <item>2025</item>
+        <item>2026</item>
+        <item>2027</item>
+        <item>2028</item>
+        <item>2029</item>
+        <item>2030</item>
+        <item>2031</item>
+        <item>2032</item>
+        <item>2033</item>
+        <item>2034</item>
+        <item>2035</item>
+        <item>2036</item>
+        <item>2037</item>
+        <item>2038</item>
+        <item>2039</item>
+        <item>2040</item>
+    </string-array>
+
+    <string-array name="month_arrays">
+        <item>Jan</item>
+        <item>Feb</item>
+        <item>Mar</item>
+        <item>Apr</item>
+        <item>May</item>
+        <item>Jun</item>
+        <item>Jul</item>
+        <item>Aug</item>
+        <item>Sep</item>
+        <item>Oct</item>
+        <item>Nov</item>
+        <item>Dec</item>
+    </string-array>
+</resources>

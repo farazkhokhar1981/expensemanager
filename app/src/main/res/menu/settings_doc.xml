@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/open_category"
+        android:icon="@drawable/ic_cat"
+        android:title="@string/add_category"/>
+    <item
+        android:id="@+id/open_addincome"
+        android:icon="@drawable/ic_add_income"
+        android:title="@string/add_income"/>
+
+
+    <item
+        android:id="@+id/open_addexpense"
+        android:icon="@drawable/ic_add_expense"
+        android:title="@string/add_expense"
+        />
+
+    <item
+        android:id="@+id/open_Dashboard"
+        android:icon="@drawable/ic_dashboards"
+        android:title="@string/dashboard" />
+
+    <item
+        android:id="@+id/open_notification"
+        android:icon="@drawable/ic_notification"
+        android:title="@string/notification" />
+
+    <item
+        android:id="@+id/open_budgetform"
+        android:icon="@drawable/ic_budget"
+        android:title="@string/menu_budget" />
+
+    <item
+        android:id="@+id/open_Settings"
+        android:icon="@drawable/ic_settings_menu"
+        android:title="@string/action_settings" />
+</menu>

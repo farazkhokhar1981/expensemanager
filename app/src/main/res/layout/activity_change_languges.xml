@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="MissingDefaultResource">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal|center_vertical"
+        android:background="@color/colorWhite"
+        android:id="@+id/linear_bg"
+
+        >
+        <LinearLayout
+            android:padding="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <LinearLayout
+                android:id="@+id/back_btn"
+                android:padding="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|center_horizontal">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_sharp_settings_24"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|center_horizontal">
+            </LinearLayout>
+
+        </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:layout_margin="5dp"
+                android:gravity="center_horizontal|center_vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal|center_vertical"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Change Language"
+                        android:textColor="@color/colorGray"
+                        android:textStyle="bold"
+                        android:textSize="28dp"
+                        android:padding="6dp"
+                        android:layout_marginTop="5dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="15dp"/>
+
+                    <LinearLayout
+                        android:id="@+id/english_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/button_rounded_white_blue"
+                        android:orientation="horizontal"
+                        android:padding="15dp"
+                        android:layout_margin="10dp"
+                        android:gravity="center_vertical|center_horizontal">
+                        <TextView
+                            android:id="@+id/english1_txt"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2.1"
+                            android:layout_gravity="left"
+                            android:text="ENGLISH"
+                            android:textColor="@color/colorlightRed"
+                            android:textSize="24dp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/english2_txt"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2.1"
+                            android:text="انگریزی"
+                            android:textColor="@color/colorlightRed"
+                            android:textSize="24dp"
+                            android:textStyle="bold" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/urdu_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/button_rounded_white_blue"
+                        android:orientation="horizontal"
+                        android:padding="15dp"
+                        android:layout_margin="10dp"
+                        android:gravity="center_vertical|center_horizontal">
+                        <TextView
+                            android:id="@+id/urdu1_txt"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2.1"
+                            android:layout_gravity="left"
+                            android:text="URDU"
+                            android:textColor="@color/colorlightRed"
+                            android:textSize="24dp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/urdu2_txt"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2.1"
+                            android:text="اردو"
+                            android:textColor="@color/colorlightRed"
+                            android:textSize="24dp"
+                            android:textStyle="bold" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/endi_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/button_rounded_white_blue"
+                        android:orientation="horizontal"
+                        android:padding="15dp"
+                        android:layout_margin="10dp"
+                        android:gravity="center_vertical|center_horizontal">
+                        <TextView
+                            android:id="@+id/hindi_txt"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2.1"
+                            android:layout_gravity="left"
+                            android:text="HINDI"
+                            android:textColor="@color/colorlightRed"
+                            android:textSize="24dp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/hindi2_txt"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2.1"
+                            android:text="हिन्दी"
+                            android:textAlignment="textEnd"
+                            android:textColor="@color/colorlightRed"
+                            android:textSize="24dp"
+                            android:textStyle="bold" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/sindhi_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/button_rounded_white_blue"
+                        android:orientation="horizontal"
+                        android:padding="15dp"
+                        android:layout_margin="10dp"
+                        android:gravity="center_vertical|center_horizontal">
+                        <TextView
+                            android:id="@+id/sindhi_txt"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2.1"
+                            android:layout_gravity="left"
+                            android:text="SINDHI"
+                            android:textColor="@color/colorlightRed"
+                            android:textSize="24dp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/sindhi2_txt"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2.1"
+                            android:text="سنڌي"
+                            android:textAlignment="textStart"
+                            android:textColor="@color/colorlightRed"
+                            android:textSize="24dp"
+                            android:textStyle="bold" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/bangla_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/button_rounded_white_blue"
+                        android:orientation="horizontal"
+                        android:padding="15dp"
+                        android:layout_margin="10dp"
+                        android:gravity="center_vertical|center_horizontal">
+                        <TextView
+                            android:id="@+id/bangla_txt"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2.1"
+                            android:layout_gravity="left"
+                            android:text="BANGLA"
+                            android:textColor="@color/colorlightRed"
+                            android:textSize="24dp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/bangla2_txt"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2.1"
+
+                            android:text="বাংলা"
+                            android:textAlignment="textEnd"
+                            android:textColor="@color/colorlightRed"
+                            android:textSize="24dp"
+                            android:textStyle="bold" />
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <FrameLayout
+                        android:id="@+id/fl_adplaceholder"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp" />
+                </ScrollView>
+
+            </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ads_lay"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="vertical">
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/adView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentBottom="true"
+                ads:adSize="BANNER"
+                ads:adUnitId="@string/banner_ad_unit_id">
+            </com.google.android.gms.ads.AdView>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

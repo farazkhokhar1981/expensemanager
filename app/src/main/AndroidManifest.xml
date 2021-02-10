@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.hrptech.expensemanager">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission
+        android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher_foreground"
+        android:label="@string/app_name2"
+        android:supportsRtl="true"
+        android:requestLegacyExternalStorage="true"
+        android:theme="@style/AppTheme">
+        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.hrptech.expensemanager"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <!-- ressource file to create -->
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths">
+            </meta-data>
+        </provider>
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-6624065608358661~3296891223"/>
+        <activity
+            android:name="com.hrptech.expensemanager.ui.home.LoginActivity"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name="com.hrptech.expensemanager.ui.home.HomeActivity"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name="com.hrptech.expensemanager.ui.home.DashBoardActivity"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name="com.hrptech.expensemanager.ui.transaction.TransactionIncomeActivity"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+        android:name="com.hrptech.expensemanager.ui.transaction.TransactionExpenseActivity"
+        android:label="@string/app_name2"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:screenOrientation="portrait"
+        tools:ignore="LockedOrientationActivity"/>
+        <activity
+            android:name="com.hrptech.expensemanager.ui.budget.BudgetFragment"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
+
+        <activity
+            android:name="com.hrptech.expensemanager.ui.backup.BackupRestoreFragment"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
+
+        <activity
+            android:name="com.hrptech.expensemanager.OpenPdfActivity"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
+        <activity
+            android:name="com.hrptech.expensemanager.ui.documents.DocumentsActivity"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
+
+        <activity
+            android:name="com.hrptech.expensemanager.ui.contact.ContactUsActivity"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
+
+        <activity
+            android:name="com.hrptech.expensemanager.YoutubeVideoLinkActivity"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
+        <activity
+            android:name="com.hrptech.expensemanager.SplashActivity"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:theme="@android:style/Theme.Translucent" />
+
+        <activity
+            android:name="com.hrptech.expensemanager.MoreActivity"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
+        <activity
+            android:name="com.hrptech.expensemanager.moreapp.MoreAppsForm"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
+
+        <activity
+            android:name="com.hrptech.expensemanager.ui.category.CategoryActivity"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
+
+        <activity
+            android:name="com.hrptech.expensemanager.ui.dailytran.DailyTransactionActivity"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
+
+        <activity
+            android:name="com.hrptech.expensemanager.ui.webserver.WebServerFragment"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
+
+
+        <activity
+            android:name="com.hrptech.expensemanager.ui.report.ReportFragment"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
+
+        <activity
+            android:name="com.hrptech.expensemanager.SettingsActivity"
+            android:label="@string/app_name2"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"/>
+
+    </application>
+
+</manifest>

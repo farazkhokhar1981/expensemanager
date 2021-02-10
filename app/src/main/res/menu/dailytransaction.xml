@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:checkableBehavior="single">
+    <item
+        android:id="@+id/sort_atoz_menu"
+        android:title="Sort [A to Z]"
+        android:checked="true"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/sort_ztoa_menu"
+        android:title="Sort [Z to A]"
+
+        />
+    <item
+        android:id="@+id/sort_bydate_asc_menu"
+        android:title="Sort by Date ASC"
+
+        />
+    <item
+        android:id="@+id/sort_bydate_desc_menu"
+        android:title="Sort by Date DESC"
+        app:showAsAction="never"
+        />
+
+
+    <item
+        android:id="@+id/debit_menu"
+        android:title="Debit(+)"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/credit_menu"
+        android:title="Credit(-)"
+        app:showAsAction="never"
+        />
+    </group>
+
+
+</menu>
