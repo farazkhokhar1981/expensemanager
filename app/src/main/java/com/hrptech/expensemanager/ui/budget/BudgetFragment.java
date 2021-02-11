@@ -20,7 +20,6 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.material.textfield.TextInputEditText;
-import com.hrptech.expensemanager.MoreActivity;
 import com.hrptech.expensemanager.R;
 import com.hrptech.expensemanager.beans.BudgetBeans;
 import com.hrptech.expensemanager.beans.CATEGORY;
@@ -107,7 +106,7 @@ public class BudgetFragment extends Activity {
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                backToMore(new Intent(BudgetFragment.this, MoreActivity.class));
+            //    backToMore(new Intent(BudgetFragment.this, MoreActivity.class));
             }
         });
 

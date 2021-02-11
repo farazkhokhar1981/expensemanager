@@ -28,7 +28,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.hrptech.expensemanager.MoreActivity;
 import com.hrptech.expensemanager.R;
 import com.hrptech.expensemanager.adapter.DailyTransactionAdapter;
 import com.hrptech.expensemanager.beans.TransactionBeans;
@@ -296,7 +295,7 @@ public void RefreshData(){
 
 
       public void BackToMain(){
-        startActivity(new Intent(DailyTransactionActivity.this,MoreActivity.class));
+      //  startActivity(new Intent(DailyTransactionActivity.this,MoreActivity.class));
         finish();
       }
 
@@ -347,7 +346,7 @@ public void RefreshData(){
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-            startActivity(new Intent(this, MoreActivity.class));
+           // startActivity(new Intent(this, MoreActivity.class));
             finish();
         }
         return true;

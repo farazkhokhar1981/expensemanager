@@ -51,7 +51,7 @@ import java.util.List;
 
 public class HomeFragment extends Fragment {
 
-    //hello
+    //hello sssssss
     private RecyclerView dailyTransactionList;
     private RecyclerView monthlyTransactionList;
     private RecyclerView yearlyTransactionList;
@@ -145,7 +145,6 @@ public class HomeFragment extends Fragment {
         budgetList.setLayoutManager(budgetManager);
 
 
-        calenderBtn = (LinearLayout) root.findViewById(R.id.cander_btn);
         calenderBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

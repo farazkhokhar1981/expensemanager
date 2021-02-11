@@ -33,7 +33,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
-import com.hrptech.expensemanager.MoreActivity;
 import com.hrptech.expensemanager.R;
 import com.hrptech.expensemanager.beans.CATEGORY;
 import com.hrptech.expensemanager.beans.PDFHeaderBeans;
@@ -185,7 +184,7 @@ public class ReportFragment extends Activity {
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                backToMore(new Intent(ReportFragment.this, MoreActivity.class));
+            //    backToMore(new Intent(ReportFragment.this, MoreActivity.class));
             }
         });
         reportList_rec = (RecyclerView) root.findViewById(R.id.reportList);
@@ -880,7 +879,7 @@ public class ReportFragment extends Activity {
     String prodName = "MEDICINA";
     @Override
     public void onBackPressed() {
-        backToMore(new Intent(ReportFragment.this, MoreActivity.class));
+       // backToMore(new Intent(ReportFragment.this, MoreActivity.class));
 
     }
 

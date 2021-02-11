@@ -31,7 +31,6 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
-import com.hrptech.expensemanager.MoreActivity;
 import com.hrptech.expensemanager.R;
 import com.hrptech.expensemanager.beans.BudgetBeans;
 import com.hrptech.expensemanager.utility.Utilities;
@@ -113,7 +112,7 @@ public class BackupRestoreFragment extends Activity {
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                backToMore(new Intent(BackupRestoreFragment.this, MoreActivity.class));
+           //     backToMore(new Intent(BackupRestoreFragment.this, MoreActivity.class));
             }
         });
 
@@ -396,7 +395,7 @@ public class BackupRestoreFragment extends Activity {
     String prodName = "MEDICINA";
     @Override
     public void onBackPressed() {
-        backToMore(new Intent(BackupRestoreFragment.this, MoreActivity.class));
+       // backToMore(new Intent(BackupRestoreFragment.this, MoreActivity.class));
 
     }
 

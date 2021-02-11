@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
-import com.hrptech.expensemanager.MoreActivity;
 import com.hrptech.expensemanager.R;
 import com.hrptech.expensemanager.beans.CATEGORY;
 import com.hrptech.expensemanager.beans.TransactionBeans;
@@ -667,8 +666,8 @@ public Activity getActivity(){
     }
 
     public void BackToMain(){
-        Intent intent = new Intent(this, MoreActivity.class);
-        startActivity(intent);
-        finish();
+//        Intent intent = new Intent(this, MoreActivity.class);
+//        startActivity(intent);
+//        finish();
     }
 }
