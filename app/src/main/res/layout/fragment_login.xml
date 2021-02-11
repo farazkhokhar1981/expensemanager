@@ -40,6 +40,8 @@
             android:paddingBottom="5dp"
             >
             <LinearLayout
+
+                android:id="@+id/accountSignIn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="20dp"
@@ -58,6 +60,8 @@
                     android:src="@drawable/ic_baseline_keyboard_arrow_right_24"/>
             </LinearLayout>
             <LinearLayout
+
+                android:id="@+id/googleSignIn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
@@ -83,6 +87,8 @@
                     android:src="@drawable/ic_baseline_keyboard_arrow_right_24"/>
             </LinearLayout>
             <LinearLayout
+
+                android:id="@+id/fbSignIn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
