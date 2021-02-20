@@ -186,7 +186,7 @@ public class YoutubeVideoLinkActivity extends Activity {
     String prodName = "MEDICINA";
     @Override
     public void onBackPressed() {
-                LoadMoreActivity(new Intent(YoutubeVideoLinkActivity.this,MoreActivity.class));
+               // LoadMoreActivity(new Intent(YoutubeVideoLinkActivity.this,MoreActivity.class));
 
     }
 

@@ -219,7 +219,7 @@ public class OpenPdfActivity extends Activity {
     }
 
     public void LoadBack(){
-        startActivity(new Intent(this,MoreActivity.class));
-        finish();
+       // startActivity(new Intent(this,MoreActivity.class));
+       // finish();
     }
 }

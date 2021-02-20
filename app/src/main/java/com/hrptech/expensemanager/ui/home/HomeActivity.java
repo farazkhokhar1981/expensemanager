@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -37,6 +39,11 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.hrptech.expensemanager.R;
 import com.hrptech.expensemanager.SettingsActivity;
 import com.hrptech.expensemanager.beans.CATEGORY;
@@ -58,9 +65,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class HomeActivity extends Activity {
 
+    DatabaseReference testReference;
 
     LinearLayout chart_id = null;
     LinearLayout budget_lay = null;
@@ -90,6 +99,29 @@ public class HomeActivity extends Activity {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.fragment_home);
         // initialiaze all objects here
+
+
+
+        testReference = FirebaseDatabase.getInstance().getReference().child("Score");
+        testReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int sum = 0;
+                for(DataSnapshot ds: snapshot.getChildren()){
+                    Map<String,Object> map = (Map<String,Object>) ds.getValue();
+                    Object value = map.get("Value");
+                    int pValue = Integer.parseInt(String.valueOf(value));
+                    sum += pValue;
+                    balance_txt.setText(String.valueOf(sum));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         init();
         PieChart pieChart = new PieChart(this);
         pieChart.setRenderer(new RoundedSlicesPieChartRenderer(pieChart, pieChart.getAnimator(), pieChart.getViewPortHandler()));
@@ -170,6 +202,8 @@ public class HomeActivity extends Activity {
             }
         }
 
+        Utilities.catNameList = categoryDB.getCatNameList();
+
         ArrayList<CATEGORY> inBeansList = categoryDB.getCategoryRecords("Income");
         if(inBeansList.size()<1){
             categoryDB.InsertRecord(getCategory("Business","Income"));
@@ -188,6 +222,9 @@ public class HomeActivity extends Activity {
         BudgetTransaction();
         ChartTransaction();
     }
+
+
+
     public CATEGORY getCategory(String name,String type){
         CATEGORY beans = new CATEGORY();
         beans.setId("");

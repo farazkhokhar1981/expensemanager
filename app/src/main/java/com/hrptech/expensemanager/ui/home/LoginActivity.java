@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -40,6 +41,7 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.login.Login;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.github.mikephil.charting.data.BarData;
@@ -75,6 +77,7 @@ import com.hrptech.expensemanager.beans.TransactionBeans;
 import com.hrptech.expensemanager.db.BudgetDB;
 import com.hrptech.expensemanager.db.CategoryDB;
 import com.hrptech.expensemanager.db.TransactionDB;
+import com.hrptech.expensemanager.email_signin;
 import com.hrptech.expensemanager.listviewitems.ChartItem;
 import com.hrptech.expensemanager.listviewitems.PieChartItem;
 import com.hrptech.expensemanager.utility.Utilities;
@@ -100,6 +103,8 @@ public class LoginActivity extends Activity {
     private CallbackManager mCallbackManager;
     LinearLayout openAccount_btn;
 
+    ProgressDialog nDialog, mDialog;
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,7 +124,8 @@ public class LoginActivity extends Activity {
         linearLayoutAccountSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(LoginActivity.this, com.hrptech.expensemanager.email_signin.class));
+                startActivity(new Intent(LoginActivity.this, email_signin.class));
+                finish();
             }
         });
 
@@ -172,6 +178,14 @@ public class LoginActivity extends Activity {
 
 
     private void handleFacebookAccessToken(AccessToken token) {
+
+        nDialog = new ProgressDialog(LoginActivity.this);
+        nDialog.setMessage("");
+        nDialog.setTitle("");
+        nDialog.setIndeterminate(false);
+        nDialog.setCancelable(false);
+        nDialog.show();
+
         Log.d("TAG", "handleFacebookAccessToken:" + token);
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
@@ -183,23 +197,30 @@ public class LoginActivity extends Activity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("TAG", "signInWithCredential:success");
                             FirebaseUser user = auth.getCurrentUser();
+                            Users users = new Users();
+                            users.setUserId(user.getUid());
+                            users.setUserName(user.getDisplayName());
+                            users.setUserEmail(user.getEmail());
+                            users.setUserProfilePic(user.getPhotoUrl().toString());
+                            database.getReference().child("Users").child(user.getUid()).setValue(users);
+
+                            nDialog.dismiss();
                             Intent intentFb = new Intent(LoginActivity.this, HomeActivity.class);
                             startActivity(intentFb);
                             Toast.makeText(LoginActivity.this, "Sign in with Facebook", Toast.LENGTH_SHORT).show();
                         } else {
                             // If sign in fails, display a message to the user.
+                            nDialog.dismiss();
                             Log.w("TAG", "signInWithCredential:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "Authentication failed: "+task.getException(),
+                                    Toast.LENGTH_LONG).show();
                         }
                         // ...
                     }
                 });
     }
 
-
     int RC_SIGN_IN = 77;
-
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -231,6 +252,14 @@ public class LoginActivity extends Activity {
     }
 
     private void firebaseAuthWithGoogle(String idToken) {
+
+        mDialog = new ProgressDialog(LoginActivity.this);
+        mDialog.setMessage("");
+        mDialog.setTitle("");
+        mDialog.setIndeterminate(false);
+        mDialog.setCancelable(false);
+        mDialog.show();
+
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         auth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -245,12 +274,14 @@ public class LoginActivity extends Activity {
                             users.setUserName(user.getDisplayName());
                             users.setUserProfilePic(user.getPhotoUrl().toString());
                             database.getReference().child("Users").child(user.getUid()).setValue(users);
+                            mDialog.dismiss();
                             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                             startActivity(intent);
                             Toast.makeText(LoginActivity.this, "Sign in with Google", Toast.LENGTH_SHORT).show();
                             //updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
+                            mDialog.dismiss();
                             Log.w("TAG", "signInWithCredential:failure", task.getException());
                             //Snackbar.make(mBinding.mainLayout, "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
                             //updateUI(null);

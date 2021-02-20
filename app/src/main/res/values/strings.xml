@@ -1,4 +1,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="facebook_app_id">270194844454196</string>
+    <string name="fb_login_protocol_scheme">fb270194844454196</string>
+
+
+
     <string name="app_name">Expense Manager and Budget Planner</string>
     <string name="app_name2">Expense Manager and\n Budget Planner</string>
     <string name="version">Version 1.1.0</string>

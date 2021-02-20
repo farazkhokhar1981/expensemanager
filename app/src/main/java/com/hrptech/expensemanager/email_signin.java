@@ -1,5 +1,6 @@
 package com.hrptech.expensemanager;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -26,6 +27,7 @@ public class email_signin extends AppCompatActivity {
     EditText txtEmail;
     EditText txtPassword;
 
+    ProgressDialog nDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,12 +60,22 @@ public class email_signin extends AppCompatActivity {
             }
 
             private void LogIn() {
+
+                nDialog = new ProgressDialog(email_signin.this);
+                nDialog.setMessage("");
+                nDialog.setTitle("");
+                nDialog.setIndeterminate(false);
+                nDialog.setCancelable(false);
+                nDialog.show();
+
+
                 FirebaseAuth.getInstance().signInWithEmailAndPassword(txtEmail.getText().toString(),txtPassword.getText().toString())
                         .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                             @Override
                             public void onSuccess(AuthResult authResult) {
                                 Toast.makeText(email_signin.this,"Login Successful...", Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(email_signin.this, HomeActivity.class));
+                                nDialog.dismiss();
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
@@ -71,7 +83,7 @@ public class email_signin extends AppCompatActivity {
                             public void onFailure(@NonNull Exception e) {
 
                                 Toast.makeText(email_signin.this, "Failed: "+e.getMessage(), Toast.LENGTH_SHORT).show();
-
+                                nDialog.dismiss();
                             }
                         });
             }

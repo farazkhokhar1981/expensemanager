@@ -56,6 +56,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.zip.ZipEntry;
@@ -124,6 +125,7 @@ public class Utilities {
     public static String lastType = "";
     public static String lastName = "";
     public static String lastDate = "";
+    public static ArrayList<CATEGORY> catNameList = new ArrayList<>();
 
 
 

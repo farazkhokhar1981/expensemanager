@@ -1,5 +1,6 @@
 package com.hrptech.expensemanager;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -29,6 +30,8 @@ public class email_registration extends AppCompatActivity {
     EditText txtPassword;
     Button btnSignUp;
     TextView txtLinkLogin;
+    ProgressDialog nDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +76,15 @@ public class email_registration extends AppCompatActivity {
             }
 
             private void registration() {
+
+                ProgressDialog nDialog;
+                nDialog = new ProgressDialog(email_registration.this);
+                nDialog.setMessage("");
+                nDialog.setTitle("");
+                nDialog.setIndeterminate(false);
+                nDialog.setCancelable(false);
+                nDialog.show();
+
                 FirebaseAuth.getInstance().createUserWithEmailAndPassword(txtEmail.getText().toString(),txtPassword.getText().toString())
                         .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                             @Override
@@ -88,6 +100,7 @@ public class email_registration extends AppCompatActivity {
                                         .setValue(users)
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             public void onComplete(@NonNull Task<Void> task) {
+                                                nDialog.dismiss();
                                                 Toast.makeText(email_registration.this,"Registration Succesfull",Toast.LENGTH_SHORT).show();
                                                 startActivity(new Intent(email_registration.this, HomeActivity.class));
                                                 finish();
@@ -99,6 +112,7 @@ public class email_registration extends AppCompatActivity {
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
+                                nDialog.dismiss();
                                 Toast.makeText(email_registration.this, "Failed: "+e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         });
