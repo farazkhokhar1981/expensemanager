@@ -30,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.hrptech.expensemanager.R;
 import com.hrptech.expensemanager.beans.CATEGORY;
 import com.hrptech.expensemanager.beans.CATEGORYs;
+import com.hrptech.expensemanager.beans.TransactionBeans;
 import com.hrptech.expensemanager.db.CategoryDB;
 import com.hrptech.expensemanager.ui.home.HomeActivity;
 import com.hrptech.expensemanager.utility.Utilities;
@@ -59,7 +60,7 @@ public class CategoryActivity extends Activity {
     }
     Activity root;
     int onStartCount = 1;
-    String sortingType = "all";
+    String sortingType = "All";
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -138,8 +139,9 @@ public class CategoryActivity extends Activity {
     ArrayList<CATEGORY> CATEGORYArrayList = new ArrayList<>();
     public void RefreshRecord(){
         CATEGORYArrayList.clear();
-        CATEGORYArrayList = categoryDB.getCategoryRecords();
-//
+
+        CATEGORYArrayList = categoryDB.getCategoryRecords(sortingType);
+
 //        ArrayList<CategoryBeans> categoryBeansArrayList = new ArrayList<>();
 //        if(sortingType.equalsIgnoreCase("all")){
 //            categoryBeansArrayList = categoryDB.getCategoryRecords();
@@ -211,6 +213,7 @@ public class CategoryActivity extends Activity {
         category.setId("");
         category.setName(name);
         category.setType(type);
+
         if(selected_Id.equalsIgnoreCase("")){
            record = categoryDB.InsertRecord(category);
             if(record>0){
@@ -220,11 +223,11 @@ public class CategoryActivity extends Activity {
             }
         }else {
             //categoryDB.UpdateRecord(selected_Id,name,type);
-            record = categoryDB.InsertRecord(category);
+            categoryDB.UpdateRecord(selected_Id,category);
             record = 1;
-            Toast.makeText(this.getActivity(),"Record Save Succussfuly....",Toast.LENGTH_LONG).show();
-            refresh();
             RefreshRecord();
+            Toast.makeText(this.getActivity(),"Record Updated Succussfuly....",Toast.LENGTH_LONG).show();
+
         }
 
 

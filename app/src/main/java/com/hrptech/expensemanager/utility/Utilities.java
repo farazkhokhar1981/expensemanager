@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -38,6 +39,7 @@ import com.hrptech.expensemanager.R;
 import com.hrptech.expensemanager.beans.CATEGORY;
 import com.hrptech.expensemanager.beans.TransactionBeans;
 import com.hrptech.expensemanager.db.SettingDB;
+import com.hrptech.expensemanager.db.TransactionDB;
 import com.hrptech.expensemanager.ui.backup.BackupRestoreFragment;
 import com.hrptech.expensemanager.ui.budget.BudgetFragment;
 import com.hrptech.expensemanager.ui.category.CategoryActivity;
@@ -703,8 +705,8 @@ public static TextView confirmTxt;
 
 
                         }  else if(dialogType.equalsIgnoreCase("update")){
-//                            TransactionIncomeActivity.getTransactionFragment().SaveRecord();
-//                            TransactionIncomeActivity.getTransactionFragment().RefreshRecord();
+                            TransactionIncomeActivity.getTransactionFragment().SaveRecord();
+                            TransactionIncomeActivity.getTransactionFragment().RefreshRecord();
                         }
 
                     }
@@ -720,6 +722,7 @@ public static TextView confirmTxt;
                             }
 
                         }  else if(dialogType.equalsIgnoreCase("update")){
+                            Log.i("MSG"," Worked for update");
                             TransactionIncomeActivity.getTransactionFragment().SaveRecord();
                             TransactionIncomeActivity.getTransactionFragment().RefreshRecord();
                         }
@@ -729,8 +732,8 @@ public static TextView confirmTxt;
                                 DailyTransactionActivity.getInstance().transactionDB.DeleteRecord(id);
                                 DailyTransactionActivity.getInstance().RefreshData();
                         }  else if(dialogType.equalsIgnoreCase("update")){
-//                            TransactionExpenseActivity.getTransactionFragment().SaveRecord();
-//                            TransactionIncomeActivity.getTransactionFragment().RefreshRecord();
+                            TransactionExpenseActivity.getTransactionFragment().SaveRecord();
+                            TransactionIncomeActivity.getTransactionFragment().RefreshRecord();
                         }
 
                     }
@@ -738,7 +741,6 @@ public static TextView confirmTxt;
                     if(CategoryActivity.getCategoryFragment()!=null){
 
                         CategoryActivity.getCategoryFragment().saveRecord();
-
                         CategoryActivity.getCategoryFragment().RefreshRecord();
                     }
                 }

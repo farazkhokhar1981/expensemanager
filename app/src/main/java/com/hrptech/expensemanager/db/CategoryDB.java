@@ -25,6 +25,10 @@ import java.util.Map;
 public class CategoryDB {
     CategoryDB categoryDB;
     Activity myActivity;
+
+    int record = 0;
+
+    DatabaseReference ref = null;
     FirebaseDatabase database =null;
     DatabaseReference databaseReference = null;
     DatabaseReference checkCatExist = null;
@@ -38,11 +42,10 @@ public class CategoryDB {
 
 
 
-    public  ArrayList<CATEGORY> getCatNameList(){
+    public static  ArrayList<CATEGORY> getCatNameList(){
 
         Utilities.catNameList.clear();
-
-        checkCatExist = FirebaseDatabase.getInstance().getReference("EXPENSEMANAGER/CATEGORY");
+        DatabaseReference checkCatExist = FirebaseDatabase.getInstance().getReference("EXPENSEMANAGER/CATEGORY");
         checkCatExist.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -50,12 +53,13 @@ public class CategoryDB {
                     Map<String,Object> map = (Map<String,Object>) ds.getValue();
                     String name = map.get("name").toString();
                     String type = map.get("type").toString();
+                    String id = map.get("id").toString();
                     CATEGORY beans = new CATEGORY();
                     beans.setName(name);
                     beans.setType(type);
+                    beans.setId(id);
                     Utilities.catNameList.add(beans);
                 }
-
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -63,8 +67,6 @@ public class CategoryDB {
         });
         return Utilities.catNameList;
     }
-
-
 
     public boolean isNameExist(String name,String type){
         for(int index=0; index<Utilities.catNameList.size(); index++){
@@ -77,28 +79,32 @@ public class CategoryDB {
         }
         return false;
     }
+
     public int InsertRecord(CATEGORY category) {
-        int record = 0;
+
+        record = 0;
         String enteredCatName = category.getName();
         String enteredType = category.getType();
-                try{
-                    if(!isNameExist(enteredCatName,enteredType)) {
-                        String userId = databaseReference.push().getKey();
-                        category.setId(userId);
-                        databaseReference.child(userId).setValue(category);
-                        record = 1;
-                    }
-                } catch (Exception e) {
-                    Toast.makeText(myActivity, "Error in inserting into table", Toast.LENGTH_LONG);
-                }
+        try{
+            if(!isNameExist(enteredCatName,enteredType)) {
+                String userId = databaseReference.push().getKey();
+                category.setId(userId);
+                databaseReference.child(userId).setValue(category);
+                record = 1;
+            }
+
+        } catch (Exception e) {
+            Toast.makeText(myActivity, "Error in inserting into table", Toast.LENGTH_LONG);
+        }
 
         return record;
     }
 
     public void UpdateRecord(String userId,CATEGORY category) {
         try {
-            category.setId(userId);
-            databaseReference.child(userId).setValue(category);
+            ref = database.getReference("EXPENSEMANAGER/CATEGORY");
+            ref.child(userId).child("name").setValue(category.getName());
+            ref.child(userId).child("type").setValue(category.getType());
         } catch (Exception e) {
             Toast.makeText(myActivity, "Error in inserting into table", Toast.LENGTH_LONG);
         }
@@ -111,7 +117,7 @@ public class CategoryDB {
             Toast.makeText(myActivity, "Error in inserting into table", Toast.LENGTH_LONG);
         }
     }
-    ArrayList<CATEGORY> beanList=new ArrayList<>();
+    public static ArrayList<CATEGORY> beanList=new ArrayList<>();
 
     public ArrayList<CATEGORY> getCategoryRecords(String types){
         beanList.clear();
@@ -119,24 +125,92 @@ public class CategoryDB {
           //  mydb = managerDB.getDatabaseInit();
            // String sqlQuery = "SELECT * FROM " + Utilities.category_tbl+" where "+Utilities.category_type+"='"+types+"'";
           //  Cursor allrows = mydb.rawQuery(sqlQuery, null);
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            if(types.equalsIgnoreCase("All")){
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Iterator<DataSnapshot> dataSnapshotIterator = dataSnapshot.getChildren().iterator();
+                        while (dataSnapshotIterator.hasNext()){
+                            DataSnapshot object = dataSnapshotIterator.next();
+                            CATEGORY users = object.getValue(CATEGORY.class);
+                            if(users!=null){
+                                beanList.add(users);
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+            else if(types.equalsIgnoreCase("Income")){
+                databaseReference.orderByChild("type").equalTo("Income").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Iterator<DataSnapshot> dataSnapshotIterator = dataSnapshot.getChildren().iterator();
+                        while (dataSnapshotIterator.hasNext()){
+                            DataSnapshot object = dataSnapshotIterator.next();
+                            CATEGORY users = object.getValue(CATEGORY.class);
+                            if(users!=null){
+                                beanList.add(users);
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
+            }
+            else if(types.equalsIgnoreCase("Expense")){
+                databaseReference.orderByChild("type").equalTo("Expense").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Iterator<DataSnapshot> dataSnapshotIterator = dataSnapshot.getChildren().iterator();
+                        while (dataSnapshotIterator.hasNext()){
+                            DataSnapshot object = dataSnapshotIterator.next();
+                            CATEGORY users = object.getValue(CATEGORY.class);
+                            if(users!=null){
+                                beanList.add(users);
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+
+
+
+         /*   DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+            Query query = reference.child("EXPENSEMANAGER/CATEGORY").orderByChild("type").equalTo(types);
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Iterator<DataSnapshot> dataSnapshotIterator = dataSnapshot.getChildren().iterator();
-                    while (dataSnapshotIterator.hasNext()){
-                        DataSnapshot object = dataSnapshotIterator.next();
-                        CATEGORY users = object.getValue(CATEGORY.class);
-                        if(users!=null){
-                            beanList.add(users);
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        // dataSnapshot is the "issue" node with all children with id 0
+                        for (DataSnapshot issue : dataSnapshot.getChildren()) {
+                            // do something with the individual "issues"
+
+                          *//*  CATEGORY users = issue.getValue(CATEGORY.class);
+                            if(users!=null){
+                                beanList.add(users);
+                            }*//*
+
                         }
                     }
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+                public void onCancelled(DatabaseError databaseError) {
 
                 }
-            });
+            });*/
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -144,12 +218,16 @@ public class CategoryDB {
         return beanList;
     }
 
-    public ArrayList<CATEGORY> getCategoryRecords(){
+    public static ArrayList<CATEGORY> getCategoryRecords(){
         beanList.clear();
         try {
             //  mydb = managerDB.getDatabaseInit();
             // String sqlQuery = "SELECT * FROM " + Utilities.category_tbl+" where "+Utilities.category_type+"='"+types+"'";
             //  Cursor allrows = mydb.rawQuery(sqlQuery, null);
+
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference databaseReference = database.getReference("EXPENSEMANAGER/CATEGORY");
+
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -162,10 +240,8 @@ public class CategoryDB {
                         }
                     }
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
                 }
             });
 

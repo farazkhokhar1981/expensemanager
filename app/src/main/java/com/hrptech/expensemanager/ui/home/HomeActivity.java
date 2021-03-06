@@ -101,7 +101,6 @@ public class HomeActivity extends Activity {
         // initialiaze all objects here
 
 
-
         testReference = FirebaseDatabase.getInstance().getReference().child("Score");
         testReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -202,7 +201,7 @@ public class HomeActivity extends Activity {
             }
         }
 
-        Utilities.catNameList = categoryDB.getCatNameList();
+
 
         ArrayList<CATEGORY> inBeansList = categoryDB.getCategoryRecords("Income");
         if(inBeansList.size()<1){

@@ -8,6 +8,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -90,7 +91,6 @@ public class TransactionIncomeActivity extends Activity {
         listAdapter = new CategoryListAdapter(this.getActivity(),categoryBeans);
         listAdapter.notifyDataSetChanged();
         category_spnr.setAdapter(listAdapter);
-
         budgetList = (RecyclerView) root.findViewById(R.id.budgetList);
         budgetList.setHasFixedSize(true);
         LinearLayoutManager horizontalManager = new LinearLayoutManager(this.getActivity(), LinearLayoutManager.VERTICAL, false);
@@ -99,8 +99,19 @@ public class TransactionIncomeActivity extends Activity {
         if(clValue!=null){
             sortingType = Utilities.getValue(this,savedInstanceState,"trans");
             selected_Id = Utilities.getValue(this,savedInstanceState,"transactionId");
-            loadCategory();
+
+            if(sortingType.equalsIgnoreCase("Income")){
+                loadCategory("Income");
+            }
+            else if(sortingType.equalsIgnoreCase("Expense")){
+                loadCategory("Expense");
+            }
+
+
+            Toast.makeText(this,"Token ID: "+selected_Id, Toast.LENGTH_LONG).show();
+
             if(!selected_Id.equalsIgnoreCase("")){
+                Toast.makeText(this,"Token ID: "+selected_Id, Toast.LENGTH_LONG).show();
                 ShowRecordOFBudgetForUpdate(selected_Id);
             }
         }
@@ -115,21 +126,23 @@ public class TransactionIncomeActivity extends Activity {
                 }
             }
         });
-        loadCategory();
+        //loadCategory(sortingType);
+
         rdoSortIncome_btn= (RadioButton) root.findViewById(R.id.income_rdo);
         rdoSortIncome_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sortingType = "Income";
-                loadCategory();
+                loadCategory(sortingType);
             }
         });
+
         rdoSortExpense_btn = (RadioButton) root.findViewById(R.id.expense_rdo);
         rdoSortExpense_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sortingType = "Expense";
-                loadCategory();
+                loadCategory(sortingType);
             }
         });
         if(sortingType.equalsIgnoreCase("Income")){
@@ -181,7 +194,8 @@ public class TransactionIncomeActivity extends Activity {
 
     }
     String className = "";
-    public void loadCategory(){
+    public void loadCategory(String type){
+
         categoryBeans = categoryDB.getCategoryRecords(sortingType);
         listAdapter = new CategoryListAdapter(this.getActivity(),categoryBeans);
         listAdapter.notifyDataSetChanged();
@@ -270,6 +284,10 @@ Calendar calendar = null;
     }
 
     public void ShowRecordOFBudgetForUpdate(String id){
+
+
+        Toast.makeText(this,"Token ID: "+selected_Id, Toast.LENGTH_LONG).show();
+
         TransactionBeans budgetBeans = transactionDB.getTransactionRecordSingle(id);
         if(budgetBeans!=null){
             String cName = budgetBeans.getName();

@@ -78,7 +78,7 @@ public class TransactionViewAdapter extends RecyclerView.Adapter<TransactionView
                     if(type.equalsIgnoreCase("income")){
                         TransactionIncomeActivity.getTransactionFragment().ShowRecordOFBudgetForUpdate(v.getTag().toString());
                     }else if(type.equalsIgnoreCase("expense")){
-                        TransactionIncomeActivity.getTransactionFragment().ShowRecordOFBudgetForUpdate(v.getTag().toString());
+                        TransactionExpenseActivity.getTransactionFragment().ShowRecordOFBudgetForUpdate(v.getTag().toString());
                     }
 
             }

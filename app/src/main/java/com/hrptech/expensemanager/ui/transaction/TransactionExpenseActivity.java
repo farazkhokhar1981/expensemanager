@@ -255,10 +255,11 @@ Calendar calendar = null;
         transactionBeans.setBalance(amount);
         if(selected_Id.equalsIgnoreCase("")) {
 
+                Toast.makeText(this,"Worked for Insert...........",Toast.LENGTH_LONG).show();
                 transactionDB.InsertRecord(transactionBeans);
 
         }else {
-
+                Toast.makeText(this,"Worked for update...........",Toast.LENGTH_LONG).show();
                 transactionDB.UpdateRecord(selected_Id,transactionBeans);
 
             selected_Id="";

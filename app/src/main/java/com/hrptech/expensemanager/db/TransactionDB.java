@@ -49,10 +49,11 @@ public class TransactionDB {
         int record = 0;
         try {
             transactionBeans.setId(id);
-            databaseReference.child(id).setValue(transactionBeans);
+            DatabaseReference dbUpdateRecord = null;
+            dbUpdateRecord.child("EXPENSEMANAGER/CATEGORY").child(id).setValue(transactionBeans);
             record = 1;
         } catch (Exception e) {
-            Toast.makeText(myActivity, "Error in inserting into table", Toast.LENGTH_LONG);
+            Toast.makeText(myActivity, "Error in updating into table", Toast.LENGTH_LONG);
         }
         return record;
     }
@@ -61,10 +62,12 @@ public class TransactionDB {
         try {
             databaseReference.child(id).removeValue();
         } catch (Exception e) {
-            Toast.makeText(myActivity, "Error in inserting into table", Toast.LENGTH_LONG);
+            Toast.makeText(myActivity, "Error in deleting from table", Toast.LENGTH_LONG);
         }
     }
 
+
+    ArrayList<CATEGORY> categoryBeans = new ArrayList<>();
 
     TransactionBeans bean=null;
     public TransactionBeans getTransactionRecordSingle(String id){
@@ -72,17 +75,18 @@ public class TransactionDB {
             //  mydb = managerDB.getDatabaseInit();
             // String sqlQuery = "SELECT * FROM " + Utilities.category_tbl+" where "+Utilities.category_type+"='"+types+"'";
             //  Cursor allrows = mydb.rawQuery(sqlQuery, null);
-            databaseReference.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    bean = dataSnapshot.getValue(TransactionBeans.class);
-                }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+            categoryBeans = CategoryDB.getCategoryRecords();
 
+
+
+            for(int index = 0; index <= categoryBeans.size(); index++){
+                if(Utilities.catNameList.get(index).getId().equalsIgnoreCase(id)){
+                    bean.setId(Utilities.catNameList.get(index).getId());
+                    bean.setName(Utilities.catNameList.get(index).getName());
+                    bean.setType(Utilities.catNameList.get(index).getType());
                 }
-            });
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
