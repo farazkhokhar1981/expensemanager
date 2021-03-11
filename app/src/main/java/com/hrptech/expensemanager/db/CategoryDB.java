@@ -3,6 +3,7 @@ package com.hrptech.expensemanager.db;
 import android.app.Activity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.icu.lang.UProperty;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -16,6 +17,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.hrptech.expensemanager.beans.CATEGORY;
 import com.hrptech.expensemanager.beans.CATEGORYs;
+import com.hrptech.expensemanager.localdb.db.GeneralDB;
+import com.hrptech.expensemanager.ui.category.CategoryActivity;
 import com.hrptech.expensemanager.utility.Utilities;
 
 import java.util.ArrayList;
@@ -24,14 +27,15 @@ import java.util.Map;
 
 public class CategoryDB {
     CategoryDB categoryDB;
+    static GeneralDB generalDB;
     Activity myActivity;
 
     int record = 0;
 
     DatabaseReference ref = null;
     FirebaseDatabase database =null;
-    DatabaseReference databaseReference = null;
     DatabaseReference checkCatExist = null;
+    DatabaseReference databaseReference = null;
     public CategoryDB(Activity myActivity){
         database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference("EXPENSEMANAGER/CATEGORY");
@@ -54,11 +58,16 @@ public class CategoryDB {
                     String name = map.get("name").toString();
                     String type = map.get("type").toString();
                     String id = map.get("id").toString();
-                    CATEGORY beans = new CATEGORY();
-                    beans.setName(name);
-                    beans.setType(type);
-                    beans.setId(id);
-                    Utilities.catNameList.add(beans);
+                    CATEGORY beans1 = new CATEGORY();
+                    beans1.setName(name);
+                    beans1.setType(type);
+                    beans1.setId(id);
+                    Utilities.catNameList.add(beans1);
+
+//                    if(!GeneralDB.checkCatExistInLocalDB(id,name,type)){
+//                        GeneralDB.InsertRecord("Category",new String[]{id, name, type});
+//                    }
+
                 }
             }
             @Override
@@ -67,6 +76,8 @@ public class CategoryDB {
         });
         return Utilities.catNameList;
     }
+
+
 
     public boolean isNameExist(String name,String type){
         for(int index=0; index<Utilities.catNameList.size(); index++){
@@ -100,14 +111,17 @@ public class CategoryDB {
         return record;
     }
 
-    public void UpdateRecord(String userId,CATEGORY category) {
+    public int UpdateRecord(String userId,CATEGORY category) {
+        record = 0;
         try {
             ref = database.getReference("EXPENSEMANAGER/CATEGORY");
             ref.child(userId).child("name").setValue(category.getName());
             ref.child(userId).child("type").setValue(category.getType());
+            record = 1;
         } catch (Exception e) {
             Toast.makeText(myActivity, "Error in inserting into table", Toast.LENGTH_LONG);
         }
+        return record;
     }
 
     public void DeleteRecord(String userId) {
@@ -117,16 +131,14 @@ public class CategoryDB {
             Toast.makeText(myActivity, "Error in inserting into table", Toast.LENGTH_LONG);
         }
     }
-    public static ArrayList<CATEGORY> beanList=new ArrayList<>();
 
     public ArrayList<CATEGORY> getCategoryRecords(String types){
-        beanList.clear();
+        Utilities.catNameList.clear();
         try {
           //  mydb = managerDB.getDatabaseInit();
            // String sqlQuery = "SELECT * FROM " + Utilities.category_tbl+" where "+Utilities.category_type+"='"+types+"'";
           //  Cursor allrows = mydb.rawQuery(sqlQuery, null);
 
-            if(types.equalsIgnoreCase("All")){
                 databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -135,8 +147,11 @@ public class CategoryDB {
                             DataSnapshot object = dataSnapshotIterator.next();
                             CATEGORY users = object.getValue(CATEGORY.class);
                             if(users!=null){
-                                beanList.add(users);
+                                Utilities.catNameList.add(users);
                             }
+                        }
+                        if(CategoryActivity.getCategoryFragment()!=null){
+                            CategoryActivity.getCategoryFragment().RefreshRecord();
                         }
                     }
                     @Override
@@ -144,44 +159,6 @@ public class CategoryDB {
 
                     }
                 });
-            }
-            else if(types.equalsIgnoreCase("Income")){
-                databaseReference.orderByChild("type").equalTo("Income").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Iterator<DataSnapshot> dataSnapshotIterator = dataSnapshot.getChildren().iterator();
-                        while (dataSnapshotIterator.hasNext()){
-                            DataSnapshot object = dataSnapshotIterator.next();
-                            CATEGORY users = object.getValue(CATEGORY.class);
-                            if(users!=null){
-                                beanList.add(users);
-                            }
-                        }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                });
-            }
-            else if(types.equalsIgnoreCase("Expense")){
-                databaseReference.orderByChild("type").equalTo("Expense").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Iterator<DataSnapshot> dataSnapshotIterator = dataSnapshot.getChildren().iterator();
-                        while (dataSnapshotIterator.hasNext()){
-                            DataSnapshot object = dataSnapshotIterator.next();
-                            CATEGORY users = object.getValue(CATEGORY.class);
-                            if(users!=null){
-                                beanList.add(users);
-                            }
-                        }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-            }
 
 
 
@@ -215,111 +192,25 @@ public class CategoryDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return beanList;
-    }
-
-    public static ArrayList<CATEGORY> getCategoryRecords(){
-        beanList.clear();
-        try {
-            //  mydb = managerDB.getDatabaseInit();
-            // String sqlQuery = "SELECT * FROM " + Utilities.category_tbl+" where "+Utilities.category_type+"='"+types+"'";
-            //  Cursor allrows = mydb.rawQuery(sqlQuery, null);
-
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference databaseReference = database.getReference("EXPENSEMANAGER/CATEGORY");
-
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Iterator<DataSnapshot> dataSnapshotIterator = dataSnapshot.getChildren().iterator();
-                    while (dataSnapshotIterator.hasNext()){
-                        DataSnapshot object = dataSnapshotIterator.next();
-                        CATEGORY users = object.getValue(CATEGORY.class);
-                        if(users!=null){
-                            beanList.add(users);
-                        }
-                    }
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                }
-            });
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return beanList;
-    }
-
-    public ArrayList<CATEGORY> getCategoryRecordsExpenseOnly(){
-      //  ArrayList<CATEGORY> beanList=new ArrayList<>();
-      //  try {
-           // mydb = managerDB.getDatabaseInit();
-            //String sqlQuery = "SELECT * FROM " +Utilities.category_tbl+" where "+Utilities.category_type+"='Expense'";
-        beanList.clear();
-        try {
-            //  mydb = managerDB.getDatabaseInit();
-            // String sqlQuery = "SELECT * FROM " + Utilities.category_tbl+" where "+Utilities.category_type+"='"+types+"'";
-            //  Cursor allrows = mydb.rawQuery(sqlQuery, null);
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Iterator<DataSnapshot> dataSnapshotIterator = dataSnapshot.getChildren().iterator();
-                    while (dataSnapshotIterator.hasNext()){
-                        DataSnapshot object = dataSnapshotIterator.next();
-                        CATEGORY users = object.getValue(CATEGORY.class);
-                        if(users!=null){
-                            beanList.add(users);
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return beanList;
-    }
-    CATEGORY bean=null;
-    public CATEGORY getCategoryRecordSingle(String userId){
-
-
-        try {
-            //  mydb = managerDB.getDatabaseInit();
-            // String sqlQuery = "SELECT * FROM " + Utilities.category_tbl+" where "+Utilities.category_type+"='"+types+"'";
-            //  Cursor allrows = mydb.rawQuery(sqlQuery, null);
-            databaseReference.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    bean = dataSnapshot.getValue(CATEGORY.class);
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return bean;
+        return Utilities.catNameList;
     }
 
     public boolean isCategoryExist(String name){
-
         return true;
     }
 
     public boolean isCategoryExist(String id,String name){
-
         return true;
     }
 
+    public CATEGORY getCategoryRecordSingle(String id) {
+        for(int index = 0; index < Utilities.catNameList.size(); index++){
+            CATEGORY beans = Utilities.catNameList.get(index);
+            String token = beans.getId();
+            if(token.equalsIgnoreCase(id)){
+                return beans;
+            }
+        }
+        return  null;
+    }
 }

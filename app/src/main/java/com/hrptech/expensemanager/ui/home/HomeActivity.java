@@ -55,6 +55,8 @@ import com.hrptech.expensemanager.db.SettingDB;
 import com.hrptech.expensemanager.db.TransactionDB;
 import com.hrptech.expensemanager.listviewitems.ChartItem;
 import com.hrptech.expensemanager.listviewitems.PieChartItem;
+import com.hrptech.expensemanager.localdb.db.GeneralDB;
+import com.hrptech.expensemanager.localdb.db.UtilitiesLocalDb;
 import com.hrptech.expensemanager.ui.budget.BudgetFragment;
 import com.hrptech.expensemanager.ui.category.CategoryActivity;
 import com.hrptech.expensemanager.ui.transaction.TransactionIncomeActivity;
@@ -100,6 +102,7 @@ public class HomeActivity extends Activity {
         setContentView(R.layout.fragment_home);
         // initialiaze all objects here
 
+        GeneralDB generalDB = new GeneralDB(this);
 
         testReference = FirebaseDatabase.getInstance().getReference().child("Score");
         testReference.addValueEventListener(new ValueEventListener() {
@@ -114,12 +117,13 @@ public class HomeActivity extends Activity {
                     balance_txt.setText(String.valueOf(sum));
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
+
+        Utilities.catNameList = categoryDB.getCatNameList();
+        generalDB.InsertRecord(UtilitiesLocalDb.category_tbl,new String[]{UtilitiesLocalDb.category_id,UtilitiesLocalDb.category_name,UtilitiesLocalDb.category_type},new String[]{"1","Hamza","Income"});
 
         init();
         PieChart pieChart = new PieChart(this);
@@ -201,36 +205,12 @@ public class HomeActivity extends Activity {
             }
         }
 
-
-
-        ArrayList<CATEGORY> inBeansList = categoryDB.getCategoryRecords("Income");
-        if(inBeansList.size()<1){
-            categoryDB.InsertRecord(getCategory("Business","Income"));
-            categoryDB.InsertRecord(getCategory("Salary","Income"));
-            categoryDB.InsertRecord(getCategory("Other","Income"));
-        }
-        ArrayList<CATEGORY> exBeansList = categoryDB.getCategoryRecords("Expense");
-        if(exBeansList.size()<1){
-            categoryDB.InsertRecord(getCategory("Utilities","Expense"));
-            categoryDB.InsertRecord(getCategory("Food","Expense"));
-            categoryDB.InsertRecord(getCategory("Eduction","Expense"));
-            categoryDB.InsertRecord(getCategory("Travil","Expense"));
-            categoryDB.InsertRecord(getCategory("Medical","Expense"));
-            categoryDB.InsertRecord(getCategory("Personal","Expense"));
-        }
         BudgetTransaction();
         ChartTransaction();
     }
 
 
 
-    public CATEGORY getCategory(String name,String type){
-        CATEGORY beans = new CATEGORY();
-        beans.setId("");
-        beans.setName(name);
-        beans.setType(type);
-        return beans;
-    }
     public void init(){
         settings_btn = (ImageView)findViewById(R.id.settings_btn);
         balance_txt = (TextView)findViewById(R.id.balance_txt);

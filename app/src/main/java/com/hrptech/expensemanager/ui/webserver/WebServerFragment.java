@@ -268,7 +268,7 @@ public Activity getActivity(){
                     }
 
                 transactionRecord += "#";
-                ArrayList<CATEGORY> categoryBeans = categoryDB.getCategoryRecords();
+                ArrayList<CATEGORY> categoryBeans = Utilities.catNameList;
                 for (int inRp = 0; inRp < categoryBeans.size(); inRp++) {
 
                     transactionRecord += categoryBeans.get(inRp).getId() + "|" + categoryBeans.get(inRp).getName() + "|" + categoryBeans.get(inRp).getType() + "&";
@@ -417,7 +417,7 @@ public Activity getActivity(){
                 }
 
                 transactionRecord += "#";
-                ArrayList<CATEGORY> categoryBeans = categoryDB.getCategoryRecords();
+                ArrayList<CATEGORY> categoryBeans = Utilities.catNameList;
                 for (int inRp = 0; inRp < categoryBeans.size(); inRp++) {
 
                     transactionRecord += categoryBeans.get(inRp).getId() + "|" + categoryBeans.get(inRp).getName() + "|" + categoryBeans.get(inRp).getType() + "&";

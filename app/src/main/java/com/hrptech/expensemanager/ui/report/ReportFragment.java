@@ -103,7 +103,7 @@ public class ReportFragment extends Activity {
         setContentView(R.layout.fragment_report);
         root = this;
         categoryDB = new CategoryDB(this.getActivity());
-        ArrayList<CATEGORY> categoryBeans = categoryDB.getCategoryRecords();
+        ArrayList<CATEGORY> categoryBeans = Utilities.catNameList;
         categoryViewAdapter = new CategoryListAdapter(this.getActivity(),categoryBeans);
         report_spr = (Spinner)root.findViewById(R.id.report_spr);
         category_spr = (Spinner)root.findViewById(R.id.category_spr);

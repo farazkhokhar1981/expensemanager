@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class TransactionIncomeActivity extends Activity {
+public class TransactionIncomeActivity extends Activity implements AdapterView.OnItemSelectedListener {
     CategoryListAdapter listAdapter;
     Spinner category_spnr;
     TextInputEditText budgetAmount_txt;
@@ -82,6 +82,7 @@ public class TransactionIncomeActivity extends Activity {
         transactionDB = new TransactionDB(this.getActivity());
         modificationDB = new ModificationDB(this.getActivity());
         category_spnr = (Spinner)root.findViewById(R.id.category_spnr);
+        category_spnr.setOnItemSelectedListener(this);
         date_txt = (TextView)root.findViewById(R.id.date_txt);
         date_txt.setText(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
         budgetAmount_txt = (TextInputEditText) root.findViewById(R.id.txtBudgetAmount);
@@ -115,6 +116,9 @@ public class TransactionIncomeActivity extends Activity {
                 ShowRecordOFBudgetForUpdate(selected_Id);
             }
         }
+
+
+
         saveBtn = (LinearLayout)root.findViewById(R.id.save_btn);
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -398,5 +402,16 @@ Calendar calendar = null;
 //        }
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        String text = adapterView.getItemAtPosition(i).toString();
+        Toast.makeText(adapterView.getContext(), text, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 }

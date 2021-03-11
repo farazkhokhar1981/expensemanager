@@ -202,7 +202,7 @@ public class LoginActivity extends Activity {
                             users.setUserName(user.getDisplayName());
                             users.setUserEmail(user.getEmail());
                             users.setUserProfilePic(user.getPhotoUrl().toString());
-                            database.getReference().child("Users").child(user.getUid()).setValue(users);
+                            database.getReference().child("EXPENSEMANAGER/USERS").child(user.getUid()).setValue(users);
 
                             nDialog.dismiss();
                             Intent intentFb = new Intent(LoginActivity.this, HomeActivity.class);
@@ -273,7 +273,7 @@ public class LoginActivity extends Activity {
                             users.setUserId(user.getUid());
                             users.setUserName(user.getDisplayName());
                             users.setUserProfilePic(user.getPhotoUrl().toString());
-                            database.getReference().child("Users").child(user.getUid()).setValue(users);
+                            database.getReference().child("EXPENSEMANAGER/USERS").child(user.getUid()).setValue(users);
                             mDialog.dismiss();
                             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                             startActivity(intent);

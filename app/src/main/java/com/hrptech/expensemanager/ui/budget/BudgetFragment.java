@@ -81,7 +81,7 @@ public class BudgetFragment extends Activity {
         budgetAmount_txt = (TextInputEditText) root.findViewById(R.id.txtBudgetAmount);
         categoryDB = new CategoryDB(this.getActivity());
         budgetDB = new BudgetDB(this.getActivity());
-        ArrayList<CATEGORY> categoryBeans = categoryDB.getCategoryRecordsExpenseOnly();
+        ArrayList<CATEGORY> categoryBeans = Utilities.catNameList;
         listAdapter = new CategoryListAdapter(this.getActivity(),categoryBeans);
         category_spnr.setAdapter(listAdapter);
         budgetList = (RecyclerView) root.findViewById(R.id.budgetList);

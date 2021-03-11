@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -67,6 +68,8 @@ import java.util.zip.ZipOutputStream;
 
 public class Utilities {
     public static boolean isLoadAdsWhenOpened = true;
+
+    Button noButton;
 
     public static String DBNAME="DAILYEXPENSE1.DB";
 
@@ -186,7 +189,6 @@ public class Utilities {
         });
 
         dialog.show();
-
     }
 
     public static void showDialogBudget(final BudgetFragment budgetFragment,final String id, Activity activity, final String type, String msg1, String msg2){
@@ -658,6 +660,10 @@ public static TextView confirmTxt;
         }else if(dialogType.equalsIgnoreCase("Update")){
             confirmTxt.setText(activity.getResources().getString(R.string.confirmUpdateRec));
         }
+        else if(dialogType.equalsIgnoreCase("close")){
+            confirmTxt.setText("No Internet Connection !!!");
+        }
+
         expenseManagerBtn = (LinearLayout) dialog.findViewById(R.id.expenseManager_btn);
         expenseManagerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -678,15 +684,28 @@ public static TextView confirmTxt;
         no_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 dialog.dismiss();
             }
         });
+
+        if(trType.equalsIgnoreCase("close") && dialogType.equalsIgnoreCase("close")){
+            Button noBTN = (Button) dialog.findViewById(R.id.no_btn);
+            noBTN.setVisibility(View.INVISIBLE);
+            Button yesBTN = (Button) dialog.findViewById(R.id.yes_btn);
+            yesBTN.setText("Exit");
+        }
+
 
         yes_btn = (Button)dialog.findViewById(R.id.yes_btn);
         yes_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if(trType.equalsIgnoreCase("close")){
+                    if(dialogType.equalsIgnoreCase("close")){
+                        System.exit(1);
+                    }
+                }
 
                 if(trType.equalsIgnoreCase("Income")){
                     if(TransactionIncomeActivity.getTransactionFragment()!=null){
@@ -694,17 +713,15 @@ public static TextView confirmTxt;
                             TransactionIncomeActivity.getTransactionFragment().transactionDB.DeleteRecord(id);
                         }  else if(dialogType.equalsIgnoreCase("update")){
                             TransactionIncomeActivity.getTransactionFragment().SaveRecord();
-
                         }
                         TransactionIncomeActivity.getTransactionFragment().RefreshRecord();
                     }else if(DailyTransactionActivity.getInstance()!=null){
+
                         if(dialogType.equalsIgnoreCase("delete")){
-
-                                DailyTransactionActivity.getInstance().transactionDB.DeleteRecord(id);
-                                DailyTransactionActivity.getInstance().RefreshData();
-
-
-                        }  else if(dialogType.equalsIgnoreCase("update")){
+                            DailyTransactionActivity.getInstance().transactionDB.DeleteRecord(id);
+                            DailyTransactionActivity.getInstance().RefreshData();
+                        }
+                        else if(dialogType.equalsIgnoreCase("update")){
                             TransactionIncomeActivity.getTransactionFragment().SaveRecord();
                             TransactionIncomeActivity.getTransactionFragment().RefreshRecord();
                         }
@@ -722,7 +739,6 @@ public static TextView confirmTxt;
                             }
 
                         }  else if(dialogType.equalsIgnoreCase("update")){
-                            Log.i("MSG"," Worked for update");
                             TransactionIncomeActivity.getTransactionFragment().SaveRecord();
                             TransactionIncomeActivity.getTransactionFragment().RefreshRecord();
                         }

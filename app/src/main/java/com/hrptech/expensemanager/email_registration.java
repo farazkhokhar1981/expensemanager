@@ -95,7 +95,7 @@ public class email_registration extends AppCompatActivity {
                                 users.setUserPassword(txtPassword.getText().toString());
 
                                 FirebaseDatabase.getInstance().getReference()
-                                        .child("Users")
+                                        .child("EXPENSEMANAGER/USERS")
                                         .child(FirebaseAuth.getInstance().getUid())
                                         .setValue(users)
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {

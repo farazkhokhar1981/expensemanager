@@ -61,6 +61,7 @@ public class CategoryActivity extends Activity {
     Activity root;
     int onStartCount = 1;
     String sortingType = "All";
+    ArrayList<CATEGORY> beansList = new ArrayList<>();
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,15 +87,28 @@ public class CategoryActivity extends Activity {
             @Override
             public void onClick(View view) {
                 sortingType = "all";
-                RefreshRecord();
+                getFilter(sortingType);
             }
         });
+
+        categoryDB.InsertRecord(getCategory("Business","Income"));
+        /*categoryDB.InsertRecord(getCategory("Salary","Income"));
+        categoryDB.InsertRecord(getCategory("Other","Income"));
+
+        categoryDB.InsertRecord(getCategory("Utilities","Expense"));
+        categoryDB.InsertRecord(getCategory("Food","Expense"));
+        categoryDB.InsertRecord(getCategory("Eduction","Expense"));
+        categoryDB.InsertRecord(getCategory("Travel","Expense"));
+        categoryDB.InsertRecord(getCategory("Medical","Expense"));*/
+        categoryDB.InsertRecord(getCategory("Personal","Expense"));
+
+
         rdoSortIncome_btn= (RadioButton) root.findViewById(R.id.income_Sort_rdo_btn);
         rdoSortIncome_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sortingType = "income";
-                RefreshRecord();
+                getFilter(sortingType);
             }
         });
         rdoSortExpense_btn = (RadioButton) root.findViewById(R.id.expense_Sort_rdo_btn);
@@ -102,7 +116,7 @@ public class CategoryActivity extends Activity {
             @Override
             public void onClick(View view) {
                 sortingType = "expense";
-                RefreshRecord();
+                getFilter(sortingType);
             }
         });
         rdoIncome_btn = (RadioButton) root.findViewById(R.id.income_rdo);
@@ -132,15 +146,86 @@ public class CategoryActivity extends Activity {
         catgeoryList.setHasFixedSize(true);
         LinearLayoutManager horizontalManager = new LinearLayoutManager(this.getActivity(), LinearLayoutManager.VERTICAL, false);
         catgeoryList.setLayoutManager(horizontalManager);
-        RefreshRecord();
+        getFilter("All");
+    }
+
+
+
+
+    public void getFilterAfterUpdate(String type, String id, CATEGORY cat){
+
+       /* ArrayList<CATEGORY> beansList = new ArrayList<>();*/
+        beansList.clear();
+        if(sortingType.equalsIgnoreCase("All")){
+            beansList =  Utilities.catNameList;
+
+            for(int index = 0; index < beansList.size(); index++){
+                if(beansList.get(index).getId().equalsIgnoreCase(id)){
+                    CATEGORY category = new CATEGORY();
+                    category.setName(cat.getName());
+                    category.setType(cat.getType());
+                    category.setId(id);
+
+                    beansList.set(index,category);
+                }
+            }
+
+        }else {
+            for (int index = 0; index < Utilities.catNameList.size(); index++) {
+                CATEGORY beans = Utilities.catNameList.get(index);
+                String type_ = beans.getType();
+                if (type_.equalsIgnoreCase(type)) {
+                    beansList.add(beans);
+                }
+            }
+
+            for(int index = 0; index < beansList.size(); index++){
+                if(beansList.get(index).getId().equalsIgnoreCase(id)){
+                    CATEGORY category = new CATEGORY();
+                    category.setName(cat.getName());
+                    category.setType(cat.getType());
+                    category.setId(id);
+
+                    beansList.set(index,category);
+                }
+            }
+        }
+
+
+        categoryViewAdapter = new CategoryViewAdapter(this.getActivity(),beansList);
+        catgeoryList.setAdapter(categoryViewAdapter);
 
     }
 
-    ArrayList<CATEGORY> CATEGORYArrayList = new ArrayList<>();
-    public void RefreshRecord(){
-        CATEGORYArrayList.clear();
+    public void getFilter(String type){
+       /* ArrayList<CATEGORY> beansList = new ArrayList<>();*/
+        beansList.removeAll(beansList);
+        if(sortingType.equalsIgnoreCase("All")){
+            beansList =  Utilities.catNameList;
+        }else {
+            for (int index = 0; index < Utilities.catNameList.size(); index++) {
+                CATEGORY beans = Utilities.catNameList.get(index);
+                String type_ = beans.getType();
+                if (type_.equalsIgnoreCase(type)) {
+                    beansList.add(beans);
+                }
+            }
+        }
+        categoryViewAdapter = new CategoryViewAdapter(this.getActivity(),beansList);
+        catgeoryList.setAdapter(categoryViewAdapter);
+    }
 
-        CATEGORYArrayList = categoryDB.getCategoryRecords(sortingType);
+    public CATEGORY getCategory(String name,String type){
+        CATEGORY beans = new CATEGORY();
+        beans.setId("");
+        beans.setName(name);
+        beans.setType(type);
+        return beans;
+    }
+
+    public void RefreshRecord(){
+        //Utilities.catNameList.clear();
+        //Utilities.catNameList = categoryDB.getCategoryRecords(sortingType);
 
 //        ArrayList<CategoryBeans> categoryBeansArrayList = new ArrayList<>();
 //        if(sortingType.equalsIgnoreCase("all")){
@@ -150,9 +235,10 @@ public class CategoryActivity extends Activity {
 //        }else if(sortingType.equalsIgnoreCase("Expense")){
 //            categoryBeansArrayList = categoryDB.getCategoryRecords("Expense");
 //        }
-        categoryViewAdapter = new CategoryViewAdapter(this.getActivity(),CATEGORYArrayList);
-        catgeoryList.setAdapter(categoryViewAdapter);
+     /*   categoryViewAdapter = new CategoryViewAdapter(this.getActivity(),Utilities.catNameList);
+        catgeoryList.setAdapter(categoryViewAdapter);*/
     }
+
     String selected_Id="";
     public void refresh(){
      selected_Id="";
@@ -171,8 +257,6 @@ public class CategoryActivity extends Activity {
                 rdoExpense_btn.setChecked(true);
             }
         }
-
-
     }
     public boolean isCategoryExist(String name){
         return false;
@@ -219,15 +303,18 @@ public class CategoryActivity extends Activity {
             if(record>0){
                 Toast.makeText(this.getActivity(),"Record Save Succussfuly....",Toast.LENGTH_LONG).show();
                 textName.setText("");
-                RefreshRecord();
+                //Utilities.catNameList.clear();
+                getFilter(sortingType);
             }
         }else {
             //categoryDB.UpdateRecord(selected_Id,name,type);
-            categoryDB.UpdateRecord(selected_Id,category);
-            record = 1;
-            RefreshRecord();
-            Toast.makeText(this.getActivity(),"Record Updated Succussfuly....",Toast.LENGTH_LONG).show();
+            record = categoryDB.UpdateRecord(selected_Id,category);
+            if(record > 0){
 
+                Toast.makeText(this.getActivity(),"Record Updated Succussfuly....",Toast.LENGTH_LONG).show();
+                getFilterAfterUpdate(sortingType,selected_Id, category);
+                refresh();
+            }
         }
 
 

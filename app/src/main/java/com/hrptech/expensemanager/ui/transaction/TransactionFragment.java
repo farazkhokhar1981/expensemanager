@@ -68,7 +68,7 @@ public class TransactionFragment extends Fragment {
         description_txt = (EditText) root.findViewById(R.id.txtDescription);
         categoryDB = new CategoryDB(this.getActivity());
         budgetDB = new BudgetDB(this.getActivity());
-        ArrayList<CATEGORY> categoryBeans = categoryDB.getCategoryRecords();
+        ArrayList<CATEGORY> categoryBeans = Utilities.catNameList;
         listAdapter = new CategoryListAdapter(this.getActivity(),categoryBeans);
         listAdapter.notifyDataSetChanged();
         category_spnr.setAdapter(listAdapter);

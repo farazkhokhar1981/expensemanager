@@ -68,7 +68,6 @@ public class TransactionDB {
 
 
     ArrayList<CATEGORY> categoryBeans = new ArrayList<>();
-
     TransactionBeans bean=null;
     public TransactionBeans getTransactionRecordSingle(String id){
         try {
@@ -76,7 +75,7 @@ public class TransactionDB {
             // String sqlQuery = "SELECT * FROM " + Utilities.category_tbl+" where "+Utilities.category_type+"='"+types+"'";
             //  Cursor allrows = mydb.rawQuery(sqlQuery, null);
 
-            categoryBeans = CategoryDB.getCategoryRecords();
+            categoryBeans = Utilities.catNameList;
 
 
 
