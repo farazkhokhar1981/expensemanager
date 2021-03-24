@@ -15,17 +15,22 @@ import com.google.firebase.database.ValueEventListener;
 import com.hrptech.expensemanager.beans.BudgetBeans;
 import com.hrptech.expensemanager.beans.CATEGORY;
 import com.hrptech.expensemanager.beans.TransactionBeans;
+import com.hrptech.expensemanager.localdb.db.GeneralDB;
+import com.hrptech.expensemanager.localdb.db.UtilitiesLocalDb;
 import com.hrptech.expensemanager.utility.Utilities;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import static com.hrptech.expensemanager.localdb.db.UtilitiesLocalDb.transaction_id;
+
 public class TransactionDB {
 
-    FirebaseDatabase database =null;
+    FirebaseDatabase database = null;
     DatabaseReference databaseReference = null;
     Activity myActivity;
-    public TransactionDB(Activity myActivity){
+
+    public TransactionDB(Activity myActivity) {
         database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference("EXPENSEMANAGER/TRANSACTION");
         this.myActivity = myActivity;
@@ -35,22 +40,32 @@ public class TransactionDB {
     public int InsertRecord(TransactionBeans transactionBeans) {
         int record = 0;
         try {
-            String userId =  databaseReference.push().getKey();
+            String userId = databaseReference.push().getKey();
             transactionBeans.setId(userId);
             databaseReference.child(userId).setValue(transactionBeans);
             record = 1;
+            GeneralDB.InsertRecord(UtilitiesLocalDb.transaction_tbl, new String[]{UtilitiesLocalDb.transaction_id, UtilitiesLocalDb.transaction_category_id, UtilitiesLocalDb.transaction_date, UtilitiesLocalDb.transaction_type, UtilitiesLocalDb.transaction_description, UtilitiesLocalDb.transaction_income, UtilitiesLocalDb.transaction_expense, UtilitiesLocalDb.transaction_balance}, new String[]{userId, transactionBeans.getCid(), transactionBeans.getDate(), transactionBeans.getType(), transactionBeans.getDescription(), transactionBeans.getIncome(), transactionBeans.getExpense(), transactionBeans.getBalance()});
         } catch (Exception e) {
             Toast.makeText(myActivity, "Error in inserting into table", Toast.LENGTH_LONG);
         }
         return record;
     }
 
-    public int UpdateRecord(String id,TransactionBeans transactionBeans) {
+    public int UpdateRecord(String id, TransactionBeans transactionBeans) {
         int record = 0;
         try {
             transactionBeans.setId(id);
-            DatabaseReference dbUpdateRecord = null;
-            dbUpdateRecord.child("EXPENSEMANAGER/CATEGORY").child(id).setValue(transactionBeans);
+            DatabaseReference dbUpdateRecord = database.getReference("EXPENSEMANAGER/TRANSACTION");
+            dbUpdateRecord.child(id).child("balance").setValue(transactionBeans.getBalance());
+            dbUpdateRecord.child(id).child("cid").setValue(transactionBeans.getCid());
+            dbUpdateRecord.child(id).child("date").setValue(transactionBeans.getDate());
+            dbUpdateRecord.child(id).child("description").setValue(transactionBeans.getDescription());
+            dbUpdateRecord.child(id).child("expense").setValue(transactionBeans.getExpense());
+            dbUpdateRecord.child(id).child("id").setValue(transactionBeans.getId());
+            dbUpdateRecord.child(id).child("income").setValue(transactionBeans.getIncome());
+            dbUpdateRecord.child(id).child("type").setValue(transactionBeans.getType());
+
+            GeneralDB.UpdateRecord(UtilitiesLocalDb.transaction_tbl, new String[]{UtilitiesLocalDb.transaction_id, UtilitiesLocalDb.transaction_category_id, UtilitiesLocalDb.transaction_date, UtilitiesLocalDb.transaction_type, UtilitiesLocalDb.transaction_description, UtilitiesLocalDb.transaction_income, UtilitiesLocalDb.transaction_expense, UtilitiesLocalDb.transaction_balance}, new String[]{transactionBeans.getId(), transactionBeans.getCid(), transactionBeans.getDate(), transactionBeans.getType(), transactionBeans.getDescription(), transactionBeans.getIncome(), transactionBeans.getExpense(), transactionBeans.getBalance()}, new String[]{transaction_id, transactionBeans.getId()});
             record = 1;
         } catch (Exception e) {
             Toast.makeText(myActivity, "Error in updating into table", Toast.LENGTH_LONG);
@@ -61,41 +76,35 @@ public class TransactionDB {
     public void DeleteRecord(String id) {
         try {
             databaseReference.child(id).removeValue();
+            GeneralDB.DeleteRecordWhere(UtilitiesLocalDb.transaction_tbl, UtilitiesLocalDb.transaction_id,id);
         } catch (Exception e) {
             Toast.makeText(myActivity, "Error in deleting from table", Toast.LENGTH_LONG);
         }
     }
 
+    TransactionBeans bean;
+    public TransactionBeans getTransactionRecordSingle(String id) {
 
-    ArrayList<CATEGORY> categoryBeans = new ArrayList<>();
-    TransactionBeans bean=null;
-    public TransactionBeans getTransactionRecordSingle(String id){
-        try {
-            //  mydb = managerDB.getDatabaseInit();
-            // String sqlQuery = "SELECT * FROM " + Utilities.category_tbl+" where "+Utilities.category_type+"='"+types+"'";
-            //  Cursor allrows = mydb.rawQuery(sqlQuery, null);
+        ArrayList<String[]> recordList;
+        recordList = GeneralDB.getRecordsWhere(UtilitiesLocalDb.transaction_tbl, new String[]{UtilitiesLocalDb.transaction_id, UtilitiesLocalDb.transaction_category_id, UtilitiesLocalDb.transaction_date, UtilitiesLocalDb.transaction_type, UtilitiesLocalDb.transaction_description, UtilitiesLocalDb.transaction_income, UtilitiesLocalDb.transaction_expense, UtilitiesLocalDb.transaction_balance}, new String[]{transaction_id}, new String[]{id});
+        for (int index = 0; index < recordList.size(); index++) {
+            TransactionBeans transactionBeans = new TransactionBeans();
 
-            categoryBeans = Utilities.catNameList;
-
-
-
-            for(int index = 0; index <= categoryBeans.size(); index++){
-                if(Utilities.catNameList.get(index).getId().equalsIgnoreCase(id)){
-                    bean.setId(Utilities.catNameList.get(index).getId());
-                    bean.setName(Utilities.catNameList.get(index).getName());
-                    bean.setType(Utilities.catNameList.get(index).getType());
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+            transactionBeans.setId(recordList.get(index)[0]);
+            transactionBeans.setCid(recordList.get(index)[1]);
+            transactionBeans.setDate(recordList.get(index)[2]);
+            transactionBeans.setType(recordList.get(index)[3]);
+            transactionBeans.setDescription(recordList.get(index)[4]);
+            transactionBeans.setIncome(recordList.get(index)[5]);
+            transactionBeans.setExpense(recordList.get(index)[6]);
+            transactionBeans.setBalance(recordList.get(index)[7]);
+            bean = transactionBeans;
         }
-
         return bean;
     }
 
 
-    public TransactionBeans getTransactionByDate(String date){
+    public TransactionBeans getTransactionByDate(String date) {
 //        TransactionBeans bean=null;
 //        try {
 //            mydb = managerDB.getDatabaseInit();
@@ -117,8 +126,8 @@ public class TransactionDB {
         return bean;
     }
 
-    public double getTransactionByOpeningBalance(String date){
-        double openingBalance=0;
+    public double getTransactionByOpeningBalance(String date) {
+        double openingBalance = 0;
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "SELECT sum("+Utilities.transaction_income+") as income,sum("+Utilities.transaction_expense+") as expense FROM " + Utilities.transaction_tbl+" where "+Utilities.transaction_date+"<'"+date+"'";
@@ -137,8 +146,8 @@ public class TransactionDB {
     }
 
 
-    public ArrayList<TransactionBeans> getTransactionRecords(){
-        ArrayList<TransactionBeans> beanList=new ArrayList<>();
+    public ArrayList<TransactionBeans> getTransactionRecords() {
+        ArrayList<TransactionBeans> beanList = new ArrayList<>();
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "SELECT * FROM " + Utilities.transaction_tbl+" as trtbl,"+Utilities.category_tbl+" as catbl where trtbl."+Utilities.transaction_cid+"=catbl."+Utilities.category_id+"";
@@ -168,8 +177,8 @@ public class TransactionDB {
         return beanList;
     }
 
-    public ArrayList<TransactionBeans> getTransactionRecordsDate(String dates){
-        ArrayList<TransactionBeans> beanList=new ArrayList<>();
+    public ArrayList<TransactionBeans> getTransactionRecordsDate(String dates) {
+        ArrayList<TransactionBeans> beanList = new ArrayList<>();
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "SELECT * FROM " + Utilities.transaction_tbl+" as trtbl,"+Utilities.category_tbl+" as catbl where trtbl."+Utilities.transaction_cid+"=catbl."+Utilities.category_id+" and trtbl."+Utilities.transaction_date+"='"+dates+"'";
@@ -203,43 +212,31 @@ public class TransactionDB {
         return beanList;
     }
 
-    public ArrayList<TransactionBeans> getTransactionRecordsDate(String dates,String type){
-        ArrayList<TransactionBeans> beanList=new ArrayList<>();
-//        try {
-//            mydb = managerDB.getDatabaseInit();
-//            String sqlQuery = "SELECT * FROM " + Utilities.transaction_tbl+" as trtbl,"+Utilities.category_tbl+" as catbl where trtbl."+Utilities.transaction_cid+"=catbl."+Utilities.category_id+" and trtbl."+Utilities.transaction_date+"='"+dates+"' and catbl."+Utilities.category_type+"='"+type+"'";
-//            Cursor allrows = mydb.rawQuery(sqlQuery, null);
-//            while (allrows.moveToNext()) {
-//                TransactionBeans bean=new TransactionBeans();
-//                String id=allrows.getString(allrows.getColumnIndex(Utilities.transaction_id));
-//                String cid=allrows.getString(allrows.getColumnIndex(Utilities.transaction_cid));
-//                String catName=allrows.getString(allrows.getColumnIndex(Utilities.category_name));
-//                String catType=allrows.getString(allrows.getColumnIndex(Utilities.category_type));
-//                String date=allrows.getString(allrows.getColumnIndex(Utilities.transaction_date));
-//                String description=allrows.getString(allrows.getColumnIndex(Utilities.transaction_description));
-//                String income=allrows.getString(allrows.getColumnIndex(Utilities.transaction_income));
-//                String expense=allrows.getString(allrows.getColumnIndex(Utilities.transaction_expense));
-//                String amount=allrows.getString(allrows.getColumnIndex(Utilities.transaction_balance));
-//                bean.setId(id);
-//                bean.setCid(cid);
-//                bean.setName(catName);
-//                bean.setType(catType);
-//                bean.setDescription(description);
-//                bean.setDate(date);
-//                bean.setIncome(income);
-//                bean.setExpense(expense);
-//                bean.setBalance(amount);
-//                beanList.add(bean);
-//            }
-//            mydb.close();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+    public ArrayList<TransactionBeans> getTransactionRecordsDate(String date, String type) {
+        ArrayList<TransactionBeans> beanList = new ArrayList<>();
+
+        ArrayList<String[]> recordList;
+        recordList = GeneralDB.getRecordsWhere(UtilitiesLocalDb.transaction_tbl, new String[]{UtilitiesLocalDb.transaction_id, UtilitiesLocalDb.transaction_category_id, UtilitiesLocalDb.transaction_date, UtilitiesLocalDb.transaction_type, UtilitiesLocalDb.transaction_description, UtilitiesLocalDb.transaction_income, UtilitiesLocalDb.transaction_expense, UtilitiesLocalDb.transaction_balance}, new String[]{UtilitiesLocalDb.transaction_date, UtilitiesLocalDb.transaction_type}, new String[]{date, type});
+        for (int index = 0; index < recordList.size(); index++) {
+            TransactionBeans transactionBeans = new TransactionBeans();
+
+            transactionBeans.setId(recordList.get(index)[0]);
+            transactionBeans.setCid(recordList.get(index)[1]);
+            transactionBeans.setDate(recordList.get(index)[2]);
+            transactionBeans.setType(recordList.get(index)[3]);
+            transactionBeans.setDescription(recordList.get(index)[4]);
+            transactionBeans.setIncome(recordList.get(index)[5]);
+            transactionBeans.setExpense(recordList.get(index)[6]);
+            transactionBeans.setBalance(recordList.get(index)[7]);
+
+            beanList.add(transactionBeans);
+
+        }
         return beanList;
     }
 
-    public ArrayList<TransactionBeans> getTransactionRecordsToDates(String fromDate,String toDate){
-        ArrayList<TransactionBeans> beanList=new ArrayList<>();
+    public ArrayList<TransactionBeans> getTransactionRecordsToDates(String fromDate, String toDate) {
+        ArrayList<TransactionBeans> beanList = new ArrayList<>();
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "SELECT * FROM " + Utilities.transaction_tbl+" as trtbl,"+Utilities.category_tbl+" as catbl where trtbl."+Utilities.transaction_cid+"=catbl."+Utilities.category_id+" and trtbl."+Utilities.transaction_date+" between '"+fromDate+"' and '"+toDate+"'";
@@ -268,8 +265,8 @@ public class TransactionDB {
         return beanList;
     }
 
-    public ArrayList<TransactionBeans> getTransactionRecordsToDatesSummary(String fromDate,String toDate){
-        ArrayList<TransactionBeans> beanList=new ArrayList<>();
+    public ArrayList<TransactionBeans> getTransactionRecordsToDatesSummary(String fromDate, String toDate) {
+        ArrayList<TransactionBeans> beanList = new ArrayList<>();
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "SELECT "+Utilities.transaction_cid+","+Utilities.category_name+","+Utilities.transaction_date+","+Utilities.category_name+",sum("+Utilities.transaction_income+") as income,sum("+Utilities.transaction_expense+") as expense FROM " + Utilities.transaction_tbl+" as trtbl,"+Utilities.category_tbl+" as catbl where trtbl."+Utilities.transaction_cid+"=catbl."+Utilities.category_id+" and trtbl."+Utilities.transaction_date+" between '"+fromDate+"' and '"+toDate+"' group by "+Utilities.transaction_date+","+Utilities.category_id+"";
@@ -299,8 +296,8 @@ public class TransactionDB {
     }
 
 
-    public ArrayList<TransactionBeans> getTransactionRecordsToDatesCategoryDetail(String fromDate,String toDate,String categoryId){
-        ArrayList<TransactionBeans> beanList=new ArrayList<>();
+    public ArrayList<TransactionBeans> getTransactionRecordsToDatesCategoryDetail(String fromDate, String toDate, String categoryId) {
+        ArrayList<TransactionBeans> beanList = new ArrayList<>();
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "SELECT * FROM " + Utilities.transaction_tbl+" as trtbl,"+Utilities.category_tbl+" as catbl where trtbl."+Utilities.transaction_cid+"=catbl."+Utilities.category_id+" and trtbl."+Utilities.transaction_date+" between '"+fromDate+"' and '"+toDate+"' and "+Utilities.category_id+"='"+categoryId+"'";
@@ -324,8 +321,8 @@ public class TransactionDB {
         return beanList;
     }
 
-    public ArrayList<TransactionBeans> getTransactionRecordsToDatesCategorySummary(String fromDate,String toDate,String categoryId){
-        ArrayList<TransactionBeans> beanList=new ArrayList<>();
+    public ArrayList<TransactionBeans> getTransactionRecordsToDatesCategorySummary(String fromDate, String toDate, String categoryId) {
+        ArrayList<TransactionBeans> beanList = new ArrayList<>();
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "SELECT "+Utilities.transaction_cid+","+Utilities.category_name+","+Utilities.transaction_date+","+Utilities.category_name+",sum("+Utilities.transaction_balance+") as balance FROM " + Utilities.transaction_tbl+" as trtbl,"+Utilities.category_tbl+" as catbl where trtbl."+Utilities.transaction_cid+"=catbl."+Utilities.category_id+" and trtbl."+Utilities.transaction_date+" between '"+fromDate+"' and '"+toDate+"' and catbl."+Utilities.category_id+"='"+categoryId+"' group by trtbl."+Utilities.transaction_date+",catbl."+Utilities.category_id+"";
@@ -350,8 +347,8 @@ public class TransactionDB {
         return beanList;
     }
 
-    public BudgetBeans getBudgetRecordSingle(String id){
-        BudgetBeans bean=null;
+    public BudgetBeans getBudgetRecordSingle(String id) {
+        BudgetBeans bean = null;
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "SELECT * FROM " + Utilities.budget_tbl+" as budtbl,"+Utilities.category_tbl+" as catbl where budtbl."+Utilities.budget_cid+"=catbl."+Utilities.category_id+" and budtbl."+Utilities.budget_id+"='"+id+"'";
@@ -380,8 +377,8 @@ public class TransactionDB {
         return bean;
     }
 
-    public ArrayList<TransactionBeans> getTransactionRecordsMonth(String month,String year){
-        ArrayList<TransactionBeans> beanList=new ArrayList<>();
+    public ArrayList<TransactionBeans> getTransactionRecordsMonth(String month, String year) {
+        ArrayList<TransactionBeans> beanList = new ArrayList<>();
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "SELECT "+Utilities.transaction_date+",sum("+Utilities.transaction_income+") as income,sum("+Utilities.transaction_expense+") as expense FROM " + Utilities.transaction_tbl+","+Utilities.category_tbl+" where "+Utilities.transaction_cid+"="+Utilities.category_id+" and strftime('%m',"+Utilities.transaction_date+")='"+month+"' and strftime('%Y',"+Utilities.transaction_date+")='"+year+"' group by "+Utilities.transaction_date+"";
@@ -406,8 +403,8 @@ public class TransactionDB {
     }
 
 
-    public ArrayList<TransactionBeans> getBudgetRecordsMonth(String month,String year){
-        ArrayList<TransactionBeans> beanList=new ArrayList<>();
+    public ArrayList<TransactionBeans> getBudgetRecordsMonth(String month, String year) {
+        ArrayList<TransactionBeans> beanList = new ArrayList<>();
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "SELECT * FROM " + Utilities.budget_tbl+","+Utilities.category_tbl+" where "+Utilities.budget_cid+"="+Utilities.category_id+" and "+Utilities.budget_month+"='"+month+"' and "+Utilities.budget_year+"='"+year+"'";
@@ -429,8 +426,8 @@ public class TransactionDB {
         return beanList;
     }
 
-    public TransactionBeans getTransactionRecordsYear(String month,String year){
-        TransactionBeans beanList=null;
+    public TransactionBeans getTransactionRecordsYear(String month, String year) {
+        TransactionBeans beanList = null;
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "SELECT "+Utilities.transaction_date+",sum("+Utilities.transaction_income+") as income,sum("+Utilities.transaction_expense+") as expense FROM " + Utilities.transaction_tbl+","+Utilities.category_tbl+" where "+Utilities.transaction_cid+"="+Utilities.category_id+" and strftime('%m',"+Utilities.transaction_date+")='"+month+"' and strftime('%Y',"+Utilities.transaction_date+")='"+year+"'";
@@ -451,8 +448,8 @@ public class TransactionDB {
         return beanList;
     }
 
-    public TransactionBeans getTransactionLast(){
-        TransactionBeans beanList=null;
+    public TransactionBeans getTransactionLast() {
+        TransactionBeans beanList = null;
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "SELECT * FROM " + Utilities.transaction_tbl+","+Utilities.category_tbl+" where "+Utilities.transaction_cid+"="+Utilities.category_id+"";
@@ -479,8 +476,8 @@ public class TransactionDB {
         return beanList;
     }
 
-    public TransactionBeans getTransactionRecordsYearCategory(String month,String year,String categoryId){
-        TransactionBeans beanList=null;
+    public TransactionBeans getTransactionRecordsYearCategory(String month, String year, String categoryId) {
+        TransactionBeans beanList = null;
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "SELECT "+Utilities.transaction_date+",sum("+Utilities.transaction_balance+") as income,sum("+Utilities.transaction_expense+") as expense FROM " + Utilities.transaction_tbl+","+Utilities.category_tbl+" where "+Utilities.transaction_cid+"="+Utilities.category_id+" and strftime('%m',"+Utilities.transaction_date+")='"+month+"' and strftime('%Y',"+Utilities.transaction_date+")='"+year+"' and "+Utilities.category_id+"='"+categoryId+"'";
@@ -498,8 +495,8 @@ public class TransactionDB {
         return beanList;
     }
 
-    public double getTransactionExpense(String year,String month,String cid){
-        double openingBalance=0;
+    public double getTransactionExpense(String year, String month, String cid) {
+        double openingBalance = 0;
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "SELECT sum("+Utilities.transaction_income+") as income,sum("+Utilities.transaction_expense+") as expense FROM " + Utilities.transaction_tbl+" where strftime('%m',"+Utilities.transaction_date+")='"+month+"' and strftime('%Y',"+Utilities.transaction_date+")='"+year+"' and "+Utilities.transaction_cid+"='"+cid+"'";
@@ -514,8 +511,9 @@ public class TransactionDB {
 //        }
         return openingBalance;
     }
-    public ArrayList<TransactionBeans> getTransactionRecordsDateAllRecords(String companyId,String search,String fromDate,String toDate){
-        ArrayList<TransactionBeans> beanList=new ArrayList<>();
+
+    public ArrayList<TransactionBeans> getTransactionRecordsDateAllRecords(String companyId, String search, String fromDate, String toDate) {
+        ArrayList<TransactionBeans> beanList = new ArrayList<>();
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "";
@@ -555,8 +553,9 @@ public class TransactionDB {
 //        }
         return beanList;
     }
-    public ArrayList<TransactionBeans> getTransactionRecordsDateAllRecords(String companyId,String search,String fromDate,String toDate,String sortType){
-        ArrayList<TransactionBeans> beanList=new ArrayList<>();
+
+    public ArrayList<TransactionBeans> getTransactionRecordsDateAllRecords(String companyId, String search, String fromDate, String toDate, String sortType) {
+        ArrayList<TransactionBeans> beanList = new ArrayList<>();
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "";
@@ -607,8 +606,8 @@ public class TransactionDB {
         return beanList;
     }
 
-    public ArrayList<TransactionBeans> getTransactionRecordsDateAll(String dates,String tDate){
-        ArrayList<TransactionBeans> beanList=new ArrayList<>();
+    public ArrayList<TransactionBeans> getTransactionRecordsDateAll(String dates, String tDate) {
+        ArrayList<TransactionBeans> beanList = new ArrayList<>();
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "SELECT trtbl."+Utilities.transaction_cid+" as cid,catbl."+Utilities.category_name+" as pname,sum(trtbl."+Utilities.transaction_income+"-trtbl."+Utilities.transaction_expense+") as total FROM " + Utilities.transaction_tbl+" as trtbl,"+Utilities.category_tbl+" as catbl where trtbl."+Utilities.transaction_cid+"=catbl."+Utilities.category_id+" and trtbl."+Utilities.transaction_date+"<='"+dates+"' group by trtbl."+Utilities.transaction_cid+"";
@@ -642,8 +641,9 @@ public class TransactionDB {
 //        }
         return beanList;
     }
-    public ArrayList<TransactionBeans> getTransactionRecordsToDatesCategoryOpeningAndClosing(String date,String categoryId){
-        ArrayList<TransactionBeans> beanList=new ArrayList<>();
+
+    public ArrayList<TransactionBeans> getTransactionRecordsToDatesCategoryOpeningAndClosing(String date, String categoryId) {
+        ArrayList<TransactionBeans> beanList = new ArrayList<>();
 //        try {
 //            mydb = managerDB.getDatabaseInit();
 //            String sqlQuery = "SELECT * FROM " + Utilities.transaction_tbl+" as trtbl,"+Utilities.category_tbl+" as catbl where trtbl."+Utilities.transaction_cid+"=catbl."+Utilities.category_id+" and strftime('%Y-%m-%d',trtbl."+Utilities.transaction_date+")<'"+date+"' and "+Utilities.category_id+"='"+categoryId+"'";

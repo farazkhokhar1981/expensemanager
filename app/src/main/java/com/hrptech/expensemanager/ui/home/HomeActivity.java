@@ -8,9 +8,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.renderscript.Sampler;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,6 +73,7 @@ public class HomeActivity extends Activity {
 
     DatabaseReference testReference;
 
+
     LinearLayout chart_id = null;
     LinearLayout budget_lay = null;
     ImageView settings_btn = null;
@@ -90,10 +91,11 @@ public class HomeActivity extends Activity {
     SettingDB settingDB;
     private BudgetViewAdapter budgetViewAdapter = null;
     private ListView listView = null;
-    String months[] = {"Jan","Feb","Mar","Apr",
-            "May","Jun","Jul","Aug",
-            "Sep","Oct","Nov","Dec"};
+    String months[] = {"Jan", "Feb", "Mar", "Apr",
+            "May", "Jun", "Jul", "Aug",
+            "Sep", "Oct", "Nov", "Dec"};
     String currency = "";
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,28 +106,41 @@ public class HomeActivity extends Activity {
 
         GeneralDB generalDB = new GeneralDB(this);
 
+
+
+        CategoryDB.getCatNameListToLocalDB();
+
+
+
         testReference = FirebaseDatabase.getInstance().getReference().child("Score");
         testReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 int sum = 0;
-                for(DataSnapshot ds: snapshot.getChildren()){
-                    Map<String,Object> map = (Map<String,Object>) ds.getValue();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    Map<String, Object> map = (Map<String, Object>) ds.getValue();
                     Object value = map.get("Value");
                     int pValue = Integer.parseInt(String.valueOf(value));
                     sum += pValue;
                     balance_txt.setText(String.valueOf(sum));
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
 
-        Utilities.catNameList = categoryDB.getCatNameList();
-        generalDB.InsertRecord(UtilitiesLocalDb.category_tbl,new String[]{UtilitiesLocalDb.category_id,UtilitiesLocalDb.category_name,UtilitiesLocalDb.category_type},new String[]{"1","Hamza","Income"});
+
+//        Utilities.catNameList = CategoryDB.getCatList();
+//        int x = 0;
+//        x = Utilities.catNameList.size();
+
+
+        // expense_txt.setText(String.valueOf(x));
 
         init();
+
         PieChart pieChart = new PieChart(this);
         pieChart.setRenderer(new RoundedSlicesPieChartRenderer(pieChart, pieChart.getAnimator(), pieChart.getViewPortHandler()));
 
@@ -138,9 +153,9 @@ public class HomeActivity extends Activity {
                 //inflating menu from xml resource
                 //popup.inflate(R.menu.main);
                 popup.inflate(R.menu.settings_doc);
-                for(int index=0; index<7; index++){
+                for (int index = 0; index < 7; index++) {
                     MenuItem menuItem = popup.getMenu().getItem(index);
-                    insertMenuItemIcon(HomeActivity.this,menuItem);
+                    insertMenuItemIcon(HomeActivity.this, menuItem);
                 }
                 //adding click listener
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -149,25 +164,25 @@ public class HomeActivity extends Activity {
                     public boolean onMenuItemClick(MenuItem item) {
 
                         int itemId = item.getItemId();
-                        switch (itemId){
+                        switch (itemId) {
                             case R.id.open_category:
-                                LoadActivity(new Intent(HomeActivity.this, CategoryActivity.class),"");
+                                LoadActivity(new Intent(HomeActivity.this, CategoryActivity.class), "");
                                 break;
 
                             case R.id.open_addincome:
-                                LoadActivity(new Intent(HomeActivity.this, TransactionIncomeActivity.class),"Income");
+                                LoadActivity(new Intent(HomeActivity.this, TransactionIncomeActivity.class), "Income");
                                 break;
                             case R.id.open_addexpense:
-                                LoadActivity(new Intent(HomeActivity.this, TransactionIncomeActivity.class),"Expense");
+                                LoadActivity(new Intent(HomeActivity.this, TransactionIncomeActivity.class), "Expense");
                                 break;
                             case R.id.open_Dashboard:
-                                LoadActivity(new Intent(HomeActivity.this,DashBoardActivity.class),"");
-                            break;
+                                LoadActivity(new Intent(HomeActivity.this, DashBoardActivity.class), "");
+                                break;
                             case R.id.open_Settings:
-                                LoadActivity(new Intent(HomeActivity.this, SettingsActivity.class),"");
+                                LoadActivity(new Intent(HomeActivity.this, SettingsActivity.class), "");
                                 break;
                             case R.id.open_budgetform:
-                                LoadActivity(new Intent(HomeActivity.this, BudgetFragment.class),"");
+                                LoadActivity(new Intent(HomeActivity.this, BudgetFragment.class), "");
                                 break;
                         }
 
@@ -180,24 +195,24 @@ public class HomeActivity extends Activity {
         });
 
         String year = new SimpleDateFormat("yyyy").format(new Date());
-        String month =months[Integer.parseInt(new SimpleDateFormat("MM").format(new Date()))-1];
-        String month_ = Utilities.getMonth(months,month);
-        TransactionBeans beansTransaction = transactionDB.getTransactionRecordsYear(month_,year);
-        if(beansTransaction!=null){
-            income_txt.setText(currency+""+beansTransaction.getIncome());
-            expense_txt.setText(currency+""+beansTransaction.getExpense());
-            balance_txt.setText(currency+""+beansTransaction.getBalance());
+        String month = months[Integer.parseInt(new SimpleDateFormat("MM").format(new Date())) - 1];
+        String month_ = Utilities.getMonth(months, month);
+        TransactionBeans beansTransaction = transactionDB.getTransactionRecordsYear(month_, year);
+        if (beansTransaction != null) {
+            income_txt.setText(currency + "" + beansTransaction.getIncome());
+            expense_txt.setText(currency + "" + beansTransaction.getExpense());
+            balance_txt.setText(currency + "" + beansTransaction.getBalance());
             TransactionBeans tBeans = transactionDB.getTransactionLast();
-            if(tBeans!=null) {
+            if (tBeans != null) {
                 circle_txt.setText(tBeans.getName().charAt(0) + "".toUpperCase());
                 type_txt.setText(tBeans.getName());
                 date_txt.setText(Utilities.getDayFromDate(tBeans.getDate(), settingBeans.getDateformat()));
-                if(tBeans.getType().equalsIgnoreCase("Income")){
+                if (tBeans.getType().equalsIgnoreCase("Income")) {
                     amount_txt.setText(currency + "" + tBeans.getIncome());
-                }else {
+                } else {
                     amount_txt.setText(currency + "" + tBeans.getExpense());
                 }
-            }else {
+            } else {
                 circle_txt.setText("A");
                 type_txt.setText("");
                 date_txt.setText("");
@@ -210,27 +225,26 @@ public class HomeActivity extends Activity {
     }
 
 
-
-    public void init(){
-        settings_btn = (ImageView)findViewById(R.id.settings_btn);
-        balance_txt = (TextView)findViewById(R.id.balance_txt);
-        income_txt = (TextView)findViewById(R.id.income_txt);
-        expense_txt = (TextView)findViewById(R.id.expense_txt);
-        circle_txt = (TextView)findViewById(R.id.circle_name);
-        type_txt = (TextView)findViewById(R.id.names_txt);
-        date_txt = (TextView)findViewById(R.id.date_txt);
-        amount_txt = (TextView)findViewById(R.id.amount_txt);
+    public void init() {
+        settings_btn = (ImageView) findViewById(R.id.settings_btn);
+        balance_txt = (TextView) findViewById(R.id.balance_txt);
+        income_txt = (TextView) findViewById(R.id.income_txt);
+        expense_txt = (TextView) findViewById(R.id.expense_txt);
+        circle_txt = (TextView) findViewById(R.id.circle_name);
+        type_txt = (TextView) findViewById(R.id.names_txt);
+        date_txt = (TextView) findViewById(R.id.date_txt);
+        amount_txt = (TextView) findViewById(R.id.amount_txt);
 //        chart_id = (LinearLayout)findViewById(R.id.chart_id);
-        listView = (ListView)findViewById(R.id.listView1);
+        listView = (ListView) findViewById(R.id.listView1);
         listView.setAdapter(null);
-        budget_lay = (LinearLayout)findViewById(R.id.budget_lay);
+        budget_lay = (LinearLayout) findViewById(R.id.budget_lay);
         transactionDB = new TransactionDB(this);
         categoryDB = new CategoryDB(this);
         settingDB = new SettingDB(this);
         settingBeans = settingDB.getSettingRecordsSingle();
-        if(settingBeans!=null){
+        if (settingBeans != null) {
             currency = settingBeans.getCurrency();
-        }else {
+        } else {
             settingBeans = new SettingBeans();
             settingBeans.setLanguge("en");
             settingBeans.setCurrency("$");
@@ -238,7 +252,7 @@ public class HomeActivity extends Activity {
             settingDB.InsertRecord(settingBeans);
             currency = "$";
         }
-        budgetList = (RecyclerView)findViewById(R.id.mRecyclerView);
+        budgetList = (RecyclerView) findViewById(R.id.mRecyclerView);
         budgetList.setHasFixedSize(true);
         LinearLayoutManager budgetManager = new LinearLayoutManager(this.getActivity(), LinearLayoutManager.VERTICAL, false);
         budgetList.setLayoutManager(budgetManager);
@@ -246,6 +260,7 @@ public class HomeActivity extends Activity {
 
 
     }
+
     private static void insertMenuItemIcon(Context context, MenuItem menuItem) {
         Drawable icon = menuItem.getIcon();
 
@@ -267,43 +282,45 @@ public class HomeActivity extends Activity {
         // the icon in the menu... we don't want two icons to appear.
         menuItem.setIcon(null);
     }
-    public void LoadActivity(Intent intent,String value){
-        intent.putExtra("trans",value);
-        intent.putExtra("transactionId","");
-        intent.putExtra("className","home");
+
+    public void LoadActivity(Intent intent, String value) {
+        intent.putExtra("trans", value);
+        intent.putExtra("transactionId", "");
+        intent.putExtra("className", "home");
         startActivity(intent);
         getActivity().finish();
     }
 
 
-    public Activity getActivity(){
+    public Activity getActivity() {
         return this;
     }
 
-    public void BudgetTransaction(){
+    public void BudgetTransaction() {
         String year = new SimpleDateFormat("yyyy").format(new Date());
-        String month =months[Integer.parseInt(new SimpleDateFormat("MM").format(new Date()))-1];
-        String month1 = Utilities.getMonth(months,month);
-        ArrayList<TransactionBeans> listOfBudget = transactionDB.getBudgetRecordsMonth(month,year);
+        String month = months[Integer.parseInt(new SimpleDateFormat("MM").format(new Date())) - 1];
+        String month1 = Utilities.getMonth(months, month);
+        ArrayList<TransactionBeans> listOfBudget = transactionDB.getBudgetRecordsMonth(month, year);
         List<BudgetBeans> budgetBeansList = new ArrayList<>();
-        for(int index=0; index<listOfBudget.size(); index++){
+        for (int index = 0; index < listOfBudget.size(); index++) {
             TransactionBeans beans = listOfBudget.get(index);
             String cid = beans.getCid();
             double budgetAmount = Double.parseDouble(beans.getExpense());
-            double expense = transactionDB.getTransactionExpense(year,month1,cid);
-            double remaining = budgetAmount-expense;
-            double per = expense/budgetAmount*100;
-            budgetBeansList.add(getBudgetList(beans.getName(),new DecimalFormat("0.00").format(budgetAmount),new DecimalFormat("0.00").format(expense),new DecimalFormat("0.00").format(remaining),new DecimalFormat("0.00").format(per)+"%",per));
+            double expense = transactionDB.getTransactionExpense(year, month1, cid);
+            double remaining = budgetAmount - expense;
+            double per = expense / budgetAmount * 100;
+            budgetBeansList.add(getBudgetList(beans.getName(), new DecimalFormat("0.00").format(budgetAmount), new DecimalFormat("0.00").format(expense), new DecimalFormat("0.00").format(remaining), new DecimalFormat("0.00").format(per) + "%", per));
         }
-        if(budgetBeansList.size()>0){
+        if (budgetBeansList.size() > 0) {
             budget_lay.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             budget_lay.setVisibility(View.GONE);
         }
-        budgetViewAdapter = new BudgetViewAdapter(this.getActivity(),budgetBeansList);
+        budgetViewAdapter = new BudgetViewAdapter(this.getActivity(), budgetBeansList);
         budgetList.setAdapter(budgetViewAdapter);
     }
-    public BudgetBeans getBudgetList(String name,String amount,String expense,String balance,String percentage,double per){
+
+    public BudgetBeans getBudgetList(String name, String amount, String expense, String balance, String percentage, double per) {
         BudgetBeans beans = new BudgetBeans();
         beans.setName(name);
         beans.setAmount(amount);
@@ -314,7 +331,7 @@ public class HomeActivity extends Activity {
         return beans;
     }
 
-    public void ChartTransaction(){
+    public void ChartTransaction() {
         ArrayList<ChartItem> list = new ArrayList<>();
 
         // 30 items
@@ -323,18 +340,17 @@ public class HomeActivity extends Activity {
         //   list.add(new LineChartItem(lineData, this.getActivity()));
         //   list.add(new BarChartItem(generateDataBar(), this.getActivity()));
         String year = new SimpleDateFormat("yyyy").format(new Date());
-        String month =months[Integer.parseInt(new SimpleDateFormat("MM").format(new Date()))-1];
-        String month1 =Utilities.getMonth(months,month);
-        ArrayList<TransactionBeans> transactionBeans = transactionDB.getTransactionRecordsMonth(month1,year);
+        String month = months[Integer.parseInt(new SimpleDateFormat("MM").format(new Date())) - 1];
+        String month1 = Utilities.getMonth(months, month);
+        ArrayList<TransactionBeans> transactionBeans = transactionDB.getTransactionRecordsMonth(month1, year);
 
-        if(transactionBeans.size()>0){
+        if (transactionBeans.size() > 0) {
             //list.add(new PieChartItem(generateDataPie(), this.getActivity(),true));
-            list.add(new PieChartItem(generateDataPie(), this.getActivity(),true));
+            list.add(new PieChartItem(generateDataPie(), this.getActivity(), true));
 
-        }else {
-            list.add(new PieChartItem(generateDataPie(), this.getActivity(),false));
+        } else {
+            list.add(new PieChartItem(generateDataPie(), this.getActivity(), false));
         }
-
 
 
         ChartDataAdapter cda = new ChartDataAdapter(this.getActivity(), list);
@@ -343,12 +359,12 @@ public class HomeActivity extends Activity {
 
     private LineData generateDataLine() {
         String year = new SimpleDateFormat("yyyy").format(new Date());
-        String month =months[Integer.parseInt(new SimpleDateFormat("MM").format(new Date()))-1];
-        String month1 =Utilities.getMonth(months,month);
+        String month = months[Integer.parseInt(new SimpleDateFormat("MM").format(new Date())) - 1];
+        String month1 = Utilities.getMonth(months, month);
         ArrayList<Entry> values1 = new ArrayList<>();
-        ArrayList<TransactionBeans> transactionBeans = transactionDB.getTransactionRecordsMonth(month1,year);
+        ArrayList<TransactionBeans> transactionBeans = transactionDB.getTransactionRecordsMonth(month1, year);
         for (int indexIncome = 0; indexIncome < transactionBeans.size(); indexIncome++) {
-            values1.add(new Entry(indexIncome, (int)(Double.parseDouble(transactionBeans.get(indexIncome).getIncome()))));
+            values1.add(new Entry(indexIncome, (int) (Double.parseDouble(transactionBeans.get(indexIncome).getIncome()))));
         }
 
         LineDataSet d1 = new LineDataSet(values1, "Income, (1)");
@@ -360,7 +376,7 @@ public class HomeActivity extends Activity {
         ArrayList<Entry> values2 = new ArrayList<>();
 
         for (int indexIncome = 0; indexIncome < transactionBeans.size(); indexIncome++) {
-            values2.add(new Entry(indexIncome, (int)(Double.parseDouble(transactionBeans.get(indexIncome).getExpense()))));
+            values2.add(new Entry(indexIncome, (int) (Double.parseDouble(transactionBeans.get(indexIncome).getExpense()))));
         }
 
         LineDataSet d2 = new LineDataSet(values2, "Expense, (2)");
@@ -383,32 +399,32 @@ public class HomeActivity extends Activity {
         ArrayList<PieEntry> entries = new ArrayList<>();
 
         String year = new SimpleDateFormat("yyyy").format(new Date());
-        String month =months[Integer.parseInt(new SimpleDateFormat("MM").format(new Date()))-1];
-        String month1 =Utilities.getMonth(months,month);
-        TransactionBeans transactionBeans = transactionDB.getTransactionRecordsYear(month1,year);
+        String month = months[Integer.parseInt(new SimpleDateFormat("MM").format(new Date())) - 1];
+        String month1 = Utilities.getMonth(months, month);
+        TransactionBeans transactionBeans = transactionDB.getTransactionRecordsYear(month1, year);
         float income = 0;
         float expense = 0;
-        if(transactionBeans!=null) {
+        if (transactionBeans != null) {
 
-            try{
+            try {
                 income = (float) (Double.parseDouble(transactionBeans.getIncome()));
-            }catch(Exception e){
+            } catch (Exception e) {
                 income = 0;
             }
-            try{
+            try {
                 expense = (float) (Double.parseDouble(transactionBeans.getExpense()));
-            }catch(Exception e){
+            } catch (Exception e) {
                 expense = 0;
             }
 
         }
 
-        if(income<1 && expense<1){
+        if (income < 1 && expense < 1) {
             income = 0.1f;
             entries.add(new PieEntry(income, ""));
             entries.add(new PieEntry(expense, ""));
 
-        }else {
+        } else {
             entries.add(new PieEntry(income, "Income"));
             entries.add(new PieEntry(expense, "Expense"));
 

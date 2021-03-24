@@ -32,6 +32,7 @@ import com.hrptech.expensemanager.db.BudgetDB;
 import com.hrptech.expensemanager.db.CategoryDB;
 import com.hrptech.expensemanager.db.ModificationDB;
 import com.hrptech.expensemanager.db.TransactionDB;
+import com.hrptech.expensemanager.localdb.db.GeneralDB;
 import com.hrptech.expensemanager.ui.budget.CategoryListAdapter;
 import com.hrptech.expensemanager.ui.home.HomeActivity;
 import com.hrptech.expensemanager.utility.AddCategoryDialog;
@@ -42,7 +43,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class TransactionIncomeActivity extends Activity implements AdapterView.OnItemSelectedListener {
+public class TransactionIncomeActivity extends Activity{
     CategoryListAdapter listAdapter;
     Spinner category_spnr;
     TextInputEditText budgetAmount_txt;
@@ -79,10 +80,13 @@ public class TransactionIncomeActivity extends Activity implements AdapterView.O
         setContentView(R.layout.fragment_transaction);
         root = this;
         transactionFragment = this;
+
+        Utilities.catNameList = CategoryDB.getCatList();
+
         transactionDB = new TransactionDB(this.getActivity());
         modificationDB = new ModificationDB(this.getActivity());
         category_spnr = (Spinner)root.findViewById(R.id.category_spnr);
-        category_spnr.setOnItemSelectedListener(this);
+
         date_txt = (TextView)root.findViewById(R.id.date_txt);
         date_txt.setText(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
         budgetAmount_txt = (TextInputEditText) root.findViewById(R.id.txtBudgetAmount);
@@ -109,7 +113,7 @@ public class TransactionIncomeActivity extends Activity implements AdapterView.O
             }
 
 
-            Toast.makeText(this,"Token ID: "+selected_Id, Toast.LENGTH_LONG).show();
+            //Toast.makeText(this,"Token ID: "+selected_Id, Toast.LENGTH_LONG).show();
 
             if(!selected_Id.equalsIgnoreCase("")){
                 Toast.makeText(this,"Token ID: "+selected_Id, Toast.LENGTH_LONG).show();
@@ -200,7 +204,7 @@ public class TransactionIncomeActivity extends Activity implements AdapterView.O
     String className = "";
     public void loadCategory(String type){
 
-        categoryBeans = categoryDB.getCategoryRecords(sortingType);
+        categoryBeans = CategoryDB.getCatListWhere(sortingType);
         listAdapter = new CategoryListAdapter(this.getActivity(),categoryBeans);
         listAdapter.notifyDataSetChanged();
         category_spnr.setAdapter(listAdapter);
@@ -288,10 +292,6 @@ Calendar calendar = null;
     }
 
     public void ShowRecordOFBudgetForUpdate(String id){
-
-
-        Toast.makeText(this,"Token ID: "+selected_Id, Toast.LENGTH_LONG).show();
-
         TransactionBeans budgetBeans = transactionDB.getTransactionRecordSingle(id);
         if(budgetBeans!=null){
             String cName = budgetBeans.getName();
@@ -404,14 +404,4 @@ Calendar calendar = null;
         finish();
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        String text = adapterView.getItemAtPosition(i).toString();
-        Toast.makeText(adapterView.getContext(), text, Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-
-    }
 }

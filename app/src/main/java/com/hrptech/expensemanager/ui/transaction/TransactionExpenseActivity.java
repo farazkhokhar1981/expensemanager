@@ -211,14 +211,15 @@ Calendar calendar = null;
         budgetList.setAdapter(transactionViewAdapter);
     }
 
-    public void ShowRecordOFBudgetForUpdate(String id){
+    //-MW-wyylfxMgUMnnVDSl
+    public void ShowRecordOFBudgetForUpdate(String id) {
         TransactionBeans budgetBeans = transactionDB.getTransactionRecordSingle(id);
-        if(budgetBeans!=null){
+        if (budgetBeans != null) {
             String cName = budgetBeans.getName();
             String date = budgetBeans.getDate();
             String description = budgetBeans.getDescription();
             String amount = budgetBeans.getBalance();
-            category_spnr.setSelection(Utilities.getIndexCategory(category_spnr,cName));
+            category_spnr.setSelection(Utilities.getIndexCategory(category_spnr, cName));
             budgetAmount_txt.setText(amount);
             description_txt.setText(description);
             date_txt.setText(date);

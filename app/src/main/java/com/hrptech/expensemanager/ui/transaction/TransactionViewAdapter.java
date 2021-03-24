@@ -20,7 +20,8 @@ public class TransactionViewAdapter extends RecyclerView.Adapter<TransactionView
     private Activity activity;
     private List<TransactionBeans> items;
     private String type = "";
-    public TransactionViewAdapter(Activity activity, List<TransactionBeans> items,String type) {
+
+    public TransactionViewAdapter(Activity activity, List<TransactionBeans> items, String type) {
         this.activity = activity;
         this.items = items;
         this.type = type;
@@ -33,7 +34,6 @@ public class TransactionViewAdapter extends RecyclerView.Adapter<TransactionView
 
         return new ViewHolder(view);
     }
-
 
 
     @Override
@@ -49,9 +49,9 @@ public class TransactionViewAdapter extends RecyclerView.Adapter<TransactionView
         viewHolder.textAmount.setText(balance);
         viewHolder.textDate.setText(date);
         viewHolder.textDescription.setText(description);
-        if(type.equalsIgnoreCase("income")){
+        if (type.equalsIgnoreCase("income")) {
             viewHolder.textType.setTextColor(activity.getResources().getColor(R.color.colorGreen));
-        }else if(type.equalsIgnoreCase("expense")){
+        } else if (type.equalsIgnoreCase("expense")) {
             viewHolder.textType.setTextColor(activity.getResources().getColor(R.color.colorRed));
         }
 
@@ -60,13 +60,12 @@ public class TransactionViewAdapter extends RecyclerView.Adapter<TransactionView
             @Override
             public void onClick(View v) {
 
-                TransactionBeans beans = (TransactionBeans)v.getTag();
-                    if(type.equalsIgnoreCase("income")){
-                        Utilities.showDialogClose(activity,"delete","Income",beans.getId(),beans.getCid());
-                    }else if(type.equalsIgnoreCase("expense")){
-                        Utilities.showDialogClose(activity,"delete","Expense",beans.getId(),beans.getCid());
-                    }
-
+                TransactionBeans beans = (TransactionBeans) v.getTag();
+                if (type.equalsIgnoreCase("income")) {
+                    Utilities.showDialogClose(activity, "delete", "Income", beans.getId(), beans.getCid());
+                } else if (type.equalsIgnoreCase("expense")) {
+                    Utilities.showDialogClose(activity, "delete", "Expense", beans.getId(), beans.getCid());
+                }
 
 
             }
@@ -75,12 +74,7 @@ public class TransactionViewAdapter extends RecyclerView.Adapter<TransactionView
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    if(type.equalsIgnoreCase("income")){
-                        TransactionIncomeActivity.getTransactionFragment().ShowRecordOFBudgetForUpdate(v.getTag().toString());
-                    }else if(type.equalsIgnoreCase("expense")){
-                        TransactionExpenseActivity.getTransactionFragment().ShowRecordOFBudgetForUpdate(v.getTag().toString());
-                    }
-
+                    TransactionIncomeActivity.getTransactionFragment().ShowRecordOFBudgetForUpdate(v.getTag().toString());
             }
         });
     }
@@ -103,11 +97,11 @@ public class TransactionViewAdapter extends RecyclerView.Adapter<TransactionView
 
         public ViewHolder(View view) {
             super(view);
-            txtName = (TextView)view.findViewById(R.id.txtName);
-            textType = (TextView)view.findViewById(R.id.txtType);
-            textAmount = (TextView)view.findViewById(R.id.amount_txt);
-            textDate = (TextView)view.findViewById(R.id.date_txt);
-            textDescription = (TextView)view.findViewById(R.id.txtDescription);
+            txtName = (TextView) view.findViewById(R.id.txtName);
+            textType = (TextView) view.findViewById(R.id.txtType);
+            textAmount = (TextView) view.findViewById(R.id.amount_txt);
+            textDate = (TextView) view.findViewById(R.id.date_txt);
+            textDescription = (TextView) view.findViewById(R.id.txtDescription);
             deleteBtn = (ImageView) view.findViewById(R.id.deleteBtn);
 
         }

@@ -1,6 +1,7 @@
 package com.hrptech.expensemanager.ui.category;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -32,6 +33,8 @@ import com.hrptech.expensemanager.beans.CATEGORY;
 import com.hrptech.expensemanager.beans.CATEGORYs;
 import com.hrptech.expensemanager.beans.TransactionBeans;
 import com.hrptech.expensemanager.db.CategoryDB;
+import com.hrptech.expensemanager.localdb.db.GeneralDB;
+import com.hrptech.expensemanager.localdb.db.UtilitiesLocalDb;
 import com.hrptech.expensemanager.ui.home.HomeActivity;
 import com.hrptech.expensemanager.utility.Utilities;
 
@@ -40,6 +43,8 @@ import java.util.Iterator;
 
 public class CategoryActivity extends Activity {
 
+
+    ProgressDialog myDialog;
 
     RadioGroup rdo_group;
     TextInputEditText textName;
@@ -55,13 +60,14 @@ public class CategoryActivity extends Activity {
     private RecyclerView catgeoryList;
     CategoryViewAdapter categoryViewAdapter;
     public static CategoryActivity categoryFragment;
-    public static CategoryActivity getCategoryFragment(){
+
+    public static CategoryActivity getCategoryFragment() {
         return categoryFragment;
     }
+
     Activity root;
     int onStartCount = 1;
     String sortingType = "All";
-    ArrayList<CATEGORY> beansList = new ArrayList<>();
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,7 +87,7 @@ public class CategoryActivity extends Activity {
         root = this;
         categoryFragment = this;
         categoryDB = new CategoryDB(this.getActivity());
-        rdo_group = (RadioGroup)root.findViewById(R.id.rgDefault);
+        rdo_group = (RadioGroup) root.findViewById(R.id.rgDefault);
         rdoSortAll_btn = (RadioButton) root.findViewById(R.id.all_Sort_rdo_btn);
         rdoSortAll_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,7 +97,10 @@ public class CategoryActivity extends Activity {
             }
         });
 
-        categoryDB.InsertRecord(getCategory("Business","Income"));
+
+        //Utilities.catNameList = CategoryDB.getCatList();
+
+        //categoryDB.InsertRecord(getCategory("Business","Income"));
         /*categoryDB.InsertRecord(getCategory("Salary","Income"));
         categoryDB.InsertRecord(getCategory("Other","Income"));
 
@@ -100,10 +109,10 @@ public class CategoryActivity extends Activity {
         categoryDB.InsertRecord(getCategory("Eduction","Expense"));
         categoryDB.InsertRecord(getCategory("Travel","Expense"));
         categoryDB.InsertRecord(getCategory("Medical","Expense"));*/
-        categoryDB.InsertRecord(getCategory("Personal","Expense"));
+        //categoryDB.InsertRecord(getCategory("Personal","Expense"));
 
 
-        rdoSortIncome_btn= (RadioButton) root.findViewById(R.id.income_Sort_rdo_btn);
+        rdoSortIncome_btn = (RadioButton) root.findViewById(R.id.income_Sort_rdo_btn);
         rdoSortIncome_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,15 +130,15 @@ public class CategoryActivity extends Activity {
         });
         rdoIncome_btn = (RadioButton) root.findViewById(R.id.income_rdo);
         rdoExpense_btn = (RadioButton) root.findViewById(R.id.expense_rdo);
-        textName = (TextInputEditText)root.findViewById(R.id.txtCategory);
+        textName = (TextInputEditText) root.findViewById(R.id.txtCategory);
         saveRecord_btn = (LinearLayout) root.findViewById(R.id.save_btn);
         saveRecord_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(selected_Id.equalsIgnoreCase("")){
+                if (selected_Id.equalsIgnoreCase("")) {
                     saveRecord();
-                }else {
-                    Utilities.showDialogClose(CategoryActivity.this,"Update","Category",selected_Id,"");
+                } else {
+                    Utilities.showDialogClose(CategoryActivity.this, "Update", "Category", selected_Id, "");
                 }
 
             }
@@ -149,60 +158,16 @@ public class CategoryActivity extends Activity {
         getFilter("All");
     }
 
-
-
-
-    public void getFilterAfterUpdate(String type, String id, CATEGORY cat){
-
-       /* ArrayList<CATEGORY> beansList = new ArrayList<>();*/
-        beansList.clear();
-        if(sortingType.equalsIgnoreCase("All")){
-            beansList =  Utilities.catNameList;
-
-            for(int index = 0; index < beansList.size(); index++){
-                if(beansList.get(index).getId().equalsIgnoreCase(id)){
-                    CATEGORY category = new CATEGORY();
-                    category.setName(cat.getName());
-                    category.setType(cat.getType());
-                    category.setId(id);
-
-                    beansList.set(index,category);
-                }
-            }
-
-        }else {
-            for (int index = 0; index < Utilities.catNameList.size(); index++) {
-                CATEGORY beans = Utilities.catNameList.get(index);
-                String type_ = beans.getType();
-                if (type_.equalsIgnoreCase(type)) {
-                    beansList.add(beans);
-                }
-            }
-
-            for(int index = 0; index < beansList.size(); index++){
-                if(beansList.get(index).getId().equalsIgnoreCase(id)){
-                    CATEGORY category = new CATEGORY();
-                    category.setName(cat.getName());
-                    category.setType(cat.getType());
-                    category.setId(id);
-
-                    beansList.set(index,category);
-                }
-            }
-        }
-
-
-        categoryViewAdapter = new CategoryViewAdapter(this.getActivity(),beansList);
-        catgeoryList.setAdapter(categoryViewAdapter);
+    public void RefreshRecord() {
 
     }
 
-    public void getFilter(String type){
-       /* ArrayList<CATEGORY> beansList = new ArrayList<>();*/
+    public void getFilter(String type) {
+        ArrayList<CATEGORY> beansList = new ArrayList<>();
         beansList.removeAll(beansList);
-        if(sortingType.equalsIgnoreCase("All")){
-            beansList =  Utilities.catNameList;
-        }else {
+        if (type.equalsIgnoreCase("All")) {
+            beansList = Utilities.catNameList;
+        } else {
             for (int index = 0; index < Utilities.catNameList.size(); index++) {
                 CATEGORY beans = Utilities.catNameList.get(index);
                 String type_ = beans.getType();
@@ -211,11 +176,12 @@ public class CategoryActivity extends Activity {
                 }
             }
         }
-        categoryViewAdapter = new CategoryViewAdapter(this.getActivity(),beansList);
+        categoryViewAdapter = new CategoryViewAdapter(this.getActivity(), beansList);
+        catgeoryList.setAdapter(null);
         catgeoryList.setAdapter(categoryViewAdapter);
     }
 
-    public CATEGORY getCategory(String name,String type){
+    public CATEGORY getCategory(String name, String type) {
         CATEGORY beans = new CATEGORY();
         beans.setId("");
         beans.setName(name);
@@ -223,63 +189,67 @@ public class CategoryActivity extends Activity {
         return beans;
     }
 
-    public void RefreshRecord(){
-        //Utilities.catNameList.clear();
-        //Utilities.catNameList = categoryDB.getCategoryRecords(sortingType);
 
-//        ArrayList<CategoryBeans> categoryBeansArrayList = new ArrayList<>();
-//        if(sortingType.equalsIgnoreCase("all")){
-//            categoryBeansArrayList = categoryDB.getCategoryRecords();
-//        }else if(sortingType.equalsIgnoreCase("income")){
-//            categoryBeansArrayList = categoryDB.getCategoryRecords("Income");
-//        }else if(sortingType.equalsIgnoreCase("Expense")){
-//            categoryBeansArrayList = categoryDB.getCategoryRecords("Expense");
-//        }
-     /*   categoryViewAdapter = new CategoryViewAdapter(this.getActivity(),Utilities.catNameList);
-        catgeoryList.setAdapter(categoryViewAdapter);*/
+    String selected_Id = "";
+
+    public void refresh() {
+        selected_Id = "";
+        textName.setText("");
     }
 
-    String selected_Id="";
-    public void refresh(){
-     selected_Id="";
-     textName.setText("");
-    }
-    public void ShowRecordOfCategory(String id){
+    public void ShowRecordOfCategory(String id) {
         CATEGORY CATEGORY = categoryDB.getCategoryRecordSingle(id);
-        if(CATEGORY !=null){
+        if (CATEGORY != null) {
             selected_Id = id;
             String name = CATEGORY.getName();
             String type = CATEGORY.getType();
             textName.setText(name);
-            if(type.equalsIgnoreCase("Income")){
+            if (type.equalsIgnoreCase("Income")) {
                 rdoIncome_btn.setChecked(true);
-            }else {
+            } else {
                 rdoExpense_btn.setChecked(true);
             }
         }
     }
-    public boolean isCategoryExist(String name){
+
+    public boolean isCategoryExist(String name) {
+
+        for (int index = 0; index < Utilities.catNameList.size(); index++) {
+            if (name.equalsIgnoreCase(Utilities.catNameList.get(index).getName())) {
+                return true;
+            }
+        }
+
         return false;
     }
-    public boolean isCategoryExist(String userId,String name){
+
+    public boolean isCategoryExist(String userId, String name) {
+
+        for (int index = 0; index < Utilities.catNameList.size(); index++) {
+            if (userId.equalsIgnoreCase(Utilities.catNameList.get(index).getType()) && name.equalsIgnoreCase(Utilities.catNameList.get(index).getName())) {
+                return true;
+            }
+        }
+
         return false;
     }
-    public void saveRecord(){
+
+    public void saveRecord() {
 
         String name = textName.getText().toString();
-        if(name.equalsIgnoreCase("")){
-            Toast.makeText(this.getActivity(),"Enter category",Toast.LENGTH_LONG).show();
+        if (name.equalsIgnoreCase("")) {
+            Toast.makeText(this.getActivity(), "Enter category", Toast.LENGTH_LONG).show();
             textName.requestFocus();
             return;
         }
-        if(selected_Id.equalsIgnoreCase("")) {
+        if (selected_Id.equalsIgnoreCase("")) {
             if (isCategoryExist(name)) {
                 Toast.makeText(this.getActivity(), "Category already exist", Toast.LENGTH_LONG).show();
                 textName.requestFocus();
                 return;
             }
-        }else {
-            if (isCategoryExist(selected_Id,name)) {
+        } else {
+            if (isCategoryExist(selected_Id, name)) {
                 Toast.makeText(this.getActivity(), "Category already exist in other record", Toast.LENGTH_LONG).show();
                 textName.requestFocus();
                 return;
@@ -287,46 +257,51 @@ public class CategoryActivity extends Activity {
         }
 
 
+
         int selectedId = rdo_group.getCheckedRadioButtonId();
 
         // find the radiobutton by returned id
-        rdo_btn = (RadioButton)root.findViewById(selectedId);
-        String type = rdo_btn.getText().toString();
+        rdo_btn = (RadioButton) root.findViewById(selectedId);
+        String type = rdo_btn.getText().toString(); // rdo button type, cat type, income or expense for adding updating records from category
         int record = 0;
         CATEGORY category = new CATEGORY();
         category.setId("");
         category.setName(name);
         category.setType(type);
 
-        if(selected_Id.equalsIgnoreCase("")){
-           record = categoryDB.InsertRecord(category);
-            if(record>0){
-                Toast.makeText(this.getActivity(),"Record Save Succussfuly....",Toast.LENGTH_LONG).show();
+        if (selected_Id.equalsIgnoreCase("")) {
+            myDialog = ProgressDialog.show(this, "","Please Wait...", true);
+            record = categoryDB.InsertRecord(category);
+            if (record > 0) {
+                CategoryDB.getCatNameListToLocalDB();
+                myDialog.dismiss();
+                Toast.makeText(this.getActivity(), "Record Save Succussfuly....", Toast.LENGTH_LONG).show();
                 textName.setText("");
-                //Utilities.catNameList.clear();
                 getFilter(sortingType);
+                myDialog.dismiss();
             }
-        }else {
-            //categoryDB.UpdateRecord(selected_Id,name,type);
-            record = categoryDB.UpdateRecord(selected_Id,category);
-            if(record > 0){
+        } else {
+            myDialog = ProgressDialog.show(this, "","Please Wait...", true);
+            record = categoryDB.UpdateRecord(selected_Id, category);
+            if (record > 0) {
 
-                Toast.makeText(this.getActivity(),"Record Updated Succussfuly....",Toast.LENGTH_LONG).show();
-                getFilterAfterUpdate(sortingType,selected_Id, category);
+                //GeneralDB.UpdateRecord(UtilitiesLocalDb.category_tbl,new String[]{UtilitiesLocalDb.category_name,UtilitiesLocalDb.category_type},new String[]{category.getName(),category.getType()},new String[]{UtilitiesLocalDb.category_id,selected_Id});
+                //Utilities.catNameList = CategoryDB.getCatList();
+                CategoryDB.getCatNameListToLocalDB();
+                Toast.makeText(this.getActivity(), "Record Updated Succussfuly....", Toast.LENGTH_LONG).show();
+                getFilter(sortingType);
+                myDialog.dismiss();
                 refresh();
             }
         }
 
 
-        rdo_btn = (RadioButton)root.findViewById(selectedId);
-
-
+        rdo_btn = (RadioButton) root.findViewById(selectedId);
         Utilities.hideKeyboardFrom(this.getActivity());
 
-
-
     }
-    public Activity getActivity(){
+
+    public Activity getActivity() {
         return root;
     }
 
@@ -338,14 +313,16 @@ public class CategoryActivity extends Activity {
         }
         return true;
     }
+
     String prodName = "MEDICINA";
+
     @Override
     public void onBackPressed() {
         backToMore(new Intent(CategoryActivity.this, HomeActivity.class));
 
     }
 
-    public void backToMore(Intent intent){
+    public void backToMore(Intent intent) {
         startActivity(intent);
         finish();
     }

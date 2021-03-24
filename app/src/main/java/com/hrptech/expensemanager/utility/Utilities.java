@@ -39,8 +39,11 @@ import com.google.android.gms.ads.formats.UnifiedNativeAdView;
 import com.hrptech.expensemanager.R;
 import com.hrptech.expensemanager.beans.CATEGORY;
 import com.hrptech.expensemanager.beans.TransactionBeans;
+import com.hrptech.expensemanager.db.CategoryDB;
 import com.hrptech.expensemanager.db.SettingDB;
 import com.hrptech.expensemanager.db.TransactionDB;
+import com.hrptech.expensemanager.localdb.db.GeneralDB;
+import com.hrptech.expensemanager.localdb.db.UtilitiesLocalDb;
 import com.hrptech.expensemanager.ui.backup.BackupRestoreFragment;
 import com.hrptech.expensemanager.ui.budget.BudgetFragment;
 import com.hrptech.expensemanager.ui.category.CategoryActivity;
@@ -171,7 +174,15 @@ public class Utilities {
             public void onClick(View v) {
                 if(type.equalsIgnoreCase("delete")){
                     categoryFragment.categoryDB.DeleteRecord(id);
-                    categoryFragment.RefreshRecord();
+                    //GeneralDB.DeleteRecordWhere(UtilitiesLocalDb.category_tbl,UtilitiesLocalDb.category_id,id);
+                    //Utilities.catNameList = CategoryDB.getCatList();
+                    CategoryDB.getCatNameListToLocalDB();
+                    for(int index = 0; index < Utilities.catNameList.size(); index++){
+                        if(Utilities.catNameList.get(index).getId().equalsIgnoreCase(id)){
+                            Utilities.catNameList.remove(index);
+                        }
+                    }
+                    categoryFragment.getFilter("All");
                     dialog.dismiss();
                 }else {
                     categoryFragment.saveRecord();
