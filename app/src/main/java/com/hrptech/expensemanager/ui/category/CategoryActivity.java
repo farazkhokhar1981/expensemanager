@@ -8,44 +8,28 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.hrptech.expensemanager.R;
 import com.hrptech.expensemanager.beans.CATEGORY;
-import com.hrptech.expensemanager.beans.CATEGORYs;
-import com.hrptech.expensemanager.beans.TransactionBeans;
 import com.hrptech.expensemanager.db.CategoryDB;
-import com.hrptech.expensemanager.localdb.db.GeneralDB;
-import com.hrptech.expensemanager.localdb.db.UtilitiesLocalDb;
 import com.hrptech.expensemanager.ui.home.HomeActivity;
 import com.hrptech.expensemanager.utility.Utilities;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class CategoryActivity extends Activity {
 
 
     ProgressDialog myDialog;
-
     RadioGroup rdo_group;
     TextInputEditText textName;
     LinearLayout saveRecord_btn;
@@ -97,19 +81,15 @@ public class CategoryActivity extends Activity {
             }
         });
 
-
-        //Utilities.catNameList = CategoryDB.getCatList();
-
-        //categoryDB.InsertRecord(getCategory("Business","Income"));
-        /*categoryDB.InsertRecord(getCategory("Salary","Income"));
+        categoryDB.InsertRecord(getCategory("Business","Income"));
+        categoryDB.InsertRecord(getCategory("Salary","Income"));
         categoryDB.InsertRecord(getCategory("Other","Income"));
-
         categoryDB.InsertRecord(getCategory("Utilities","Expense"));
         categoryDB.InsertRecord(getCategory("Food","Expense"));
         categoryDB.InsertRecord(getCategory("Eduction","Expense"));
         categoryDB.InsertRecord(getCategory("Travel","Expense"));
-        categoryDB.InsertRecord(getCategory("Medical","Expense"));*/
-        //categoryDB.InsertRecord(getCategory("Personal","Expense"));
+        categoryDB.InsertRecord(getCategory("Medical","Expense"));
+        categoryDB.InsertRecord(getCategory("Personal","Expense"));
 
 
         rdoSortIncome_btn = (RadioButton) root.findViewById(R.id.income_Sort_rdo_btn);
@@ -273,12 +253,11 @@ public class CategoryActivity extends Activity {
             myDialog = ProgressDialog.show(this, "","Please Wait...", true);
             record = categoryDB.InsertRecord(category);
             if (record > 0) {
-                CategoryDB.getCatNameListToLocalDB();
+                CategoryDB.getCatNameList();
                 myDialog.dismiss();
                 Toast.makeText(this.getActivity(), "Record Save Succussfuly....", Toast.LENGTH_LONG).show();
                 textName.setText("");
                 getFilter(sortingType);
-                myDialog.dismiss();
             }
         } else {
             myDialog = ProgressDialog.show(this, "","Please Wait...", true);
@@ -287,10 +266,11 @@ public class CategoryActivity extends Activity {
 
                 //GeneralDB.UpdateRecord(UtilitiesLocalDb.category_tbl,new String[]{UtilitiesLocalDb.category_name,UtilitiesLocalDb.category_type},new String[]{category.getName(),category.getType()},new String[]{UtilitiesLocalDb.category_id,selected_Id});
                 //Utilities.catNameList = CategoryDB.getCatList();
-                CategoryDB.getCatNameListToLocalDB();
+                CategoryDB.getCatNameList();
+                myDialog.dismiss();
                 Toast.makeText(this.getActivity(), "Record Updated Succussfuly....", Toast.LENGTH_LONG).show();
                 getFilter(sortingType);
-                myDialog.dismiss();
+
                 refresh();
             }
         }

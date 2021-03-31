@@ -103,7 +103,6 @@ public class TransactionViewAdapter extends RecyclerView.Adapter<TransactionView
             textDate = (TextView) view.findViewById(R.id.date_txt);
             textDescription = (TextView) view.findViewById(R.id.txtDescription);
             deleteBtn = (ImageView) view.findViewById(R.id.deleteBtn);
-
         }
 
     }

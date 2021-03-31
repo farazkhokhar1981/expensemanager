@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.ads.AdView;
 import com.hrptech.expensemanager.R;
 import com.hrptech.expensemanager.beans.CATEGORY;
+import com.hrptech.expensemanager.ui.transaction.TransactionIncomeActivity;
+import com.hrptech.expensemanager.utility.AddCategoryDialog;
 import com.hrptech.expensemanager.utility.Utilities;
 
 import java.util.List;
@@ -54,6 +56,9 @@ public class CategoryViewAdapter extends RecyclerView.Adapter<CategoryViewAdapte
             public void onClick(View v) {
                 if(CategoryActivity.getCategoryFragment()!=null){
                     Utilities.showDialogCategory(CategoryActivity.getCategoryFragment(),v.getTag().toString(),activity,"delete","Do you want to","delete category");
+                }
+                else if(TransactionIncomeActivity.getTransactionFragment()!=null){
+                    Utilities.showIncomeActivityDialogTransaction(TransactionIncomeActivity.getTransactionFragment(),v.getTag().toString(),activity,"delete","Do you want to","delete category");
                 }
             }
         });

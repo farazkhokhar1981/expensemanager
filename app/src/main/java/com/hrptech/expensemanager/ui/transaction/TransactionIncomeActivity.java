@@ -2,13 +2,13 @@ package com.hrptech.expensemanager.ui.transaction;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -32,7 +32,6 @@ import com.hrptech.expensemanager.db.BudgetDB;
 import com.hrptech.expensemanager.db.CategoryDB;
 import com.hrptech.expensemanager.db.ModificationDB;
 import com.hrptech.expensemanager.db.TransactionDB;
-import com.hrptech.expensemanager.localdb.db.GeneralDB;
 import com.hrptech.expensemanager.ui.budget.CategoryListAdapter;
 import com.hrptech.expensemanager.ui.home.HomeActivity;
 import com.hrptech.expensemanager.utility.AddCategoryDialog;
@@ -43,10 +42,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class TransactionIncomeActivity extends Activity{
+public class TransactionIncomeActivity extends Activity {
     CategoryListAdapter listAdapter;
     Spinner category_spnr;
     TextInputEditText budgetAmount_txt;
+
+    ProgressDialog myDialog;
 
     EditText description_txt;
     LinearLayout saveBtn;
@@ -61,9 +62,11 @@ public class TransactionIncomeActivity extends Activity{
     private RecyclerView budgetList;
     TransactionViewAdapter transactionViewAdapter;
     public static TransactionIncomeActivity transactionFragment;
-    public static TransactionIncomeActivity getTransactionFragment(){
+
+    public static TransactionIncomeActivity getTransactionFragment() {
         return transactionFragment;
     }
+
     DatePickerDialog datePickerDialog;
     ImageView calenderBtn;
     ImageView addCategory_btn;
@@ -73,6 +76,7 @@ public class TransactionIncomeActivity extends Activity{
     String sortingType = "";
     String clValue = "";
     ArrayList<CATEGORY> categoryBeans = new ArrayList<>();
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -81,62 +85,59 @@ public class TransactionIncomeActivity extends Activity{
         root = this;
         transactionFragment = this;
 
-        Utilities.catNameList = CategoryDB.getCatList();
+        CategoryDB.getCatNameList();
+        //TransactionDB.getTransactionList();
 
         transactionDB = new TransactionDB(this.getActivity());
         modificationDB = new ModificationDB(this.getActivity());
-        category_spnr = (Spinner)root.findViewById(R.id.category_spnr);
+        category_spnr = (Spinner) root.findViewById(R.id.category_spnr);
 
-        date_txt = (TextView)root.findViewById(R.id.date_txt);
+        date_txt = (TextView) root.findViewById(R.id.date_txt);
         date_txt.setText(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
         budgetAmount_txt = (TextInputEditText) root.findViewById(R.id.txtBudgetAmount);
         description_txt = (EditText) root.findViewById(R.id.txtDescription);
         categoryDB = new CategoryDB(this.getActivity());
         budgetDB = new BudgetDB(this.getActivity());
-        listAdapter = new CategoryListAdapter(this.getActivity(),categoryBeans);
+        listAdapter = new CategoryListAdapter(this.getActivity(), categoryBeans);
         listAdapter.notifyDataSetChanged();
         category_spnr.setAdapter(listAdapter);
         budgetList = (RecyclerView) root.findViewById(R.id.budgetList);
         budgetList.setHasFixedSize(true);
         LinearLayoutManager horizontalManager = new LinearLayoutManager(this.getActivity(), LinearLayoutManager.VERTICAL, false);
         budgetList.setLayoutManager(horizontalManager);
-        clValue = Utilities.getValue(this,savedInstanceState,"className");
-        if(clValue!=null){
-            sortingType = Utilities.getValue(this,savedInstanceState,"trans");
-            selected_Id = Utilities.getValue(this,savedInstanceState,"transactionId");
+        clValue = Utilities.getValue(this, savedInstanceState, "className");
+        if (clValue != null) {
+            sortingType = Utilities.getValue(this, savedInstanceState, "trans");
+            selected_Id = Utilities.getValue(this, savedInstanceState, "transactionId");
 
-            if(sortingType.equalsIgnoreCase("Income")){
+            if (sortingType.equalsIgnoreCase("Income")) {
                 loadCategory("Income");
-            }
-            else if(sortingType.equalsIgnoreCase("Expense")){
+            } else if (sortingType.equalsIgnoreCase("Expense")) {
                 loadCategory("Expense");
             }
 
-
             //Toast.makeText(this,"Token ID: "+selected_Id, Toast.LENGTH_LONG).show();
-
-            if(!selected_Id.equalsIgnoreCase("")){
-                Toast.makeText(this,"Token ID: "+selected_Id, Toast.LENGTH_LONG).show();
+            if (!selected_Id.equalsIgnoreCase("")) {
+                //Toast.makeText(this, "Token ID: " + selected_Id, Toast.LENGTH_LONG).show();
                 ShowRecordOFBudgetForUpdate(selected_Id);
             }
         }
 
 
-
-        saveBtn = (LinearLayout)root.findViewById(R.id.save_btn);
+        saveBtn = (LinearLayout) root.findViewById(R.id.save_btn);
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(selected_Id.equalsIgnoreCase("")){
+                if (selected_Id.equalsIgnoreCase("")) {
                     SaveRecord();
-                }else {
-                    Utilities.showDialogClose(TransactionIncomeActivity.this,"Update","Income",selected_Id,"");
+                } else {
+                    Utilities.showDialogClose(TransactionIncomeActivity.this, "Update", "Income", selected_Id, "");
                 }
             }
         });
         //loadCategory(sortingType);
 
-        rdoSortIncome_btn= (RadioButton) root.findViewById(R.id.income_rdo);
+        rdoSortIncome_btn = (RadioButton) root.findViewById(R.id.income_rdo);
         rdoSortIncome_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -153,14 +154,13 @@ public class TransactionIncomeActivity extends Activity{
                 loadCategory(sortingType);
             }
         });
-        if(sortingType.equalsIgnoreCase("Income")){
+        if (sortingType.equalsIgnoreCase("Income")) {
             rdoSortIncome_btn.setChecked(true);
             rdoSortExpense_btn.setChecked(false);
-        }else if(sortingType.equalsIgnoreCase("Expense")){
+        } else if (sortingType.equalsIgnoreCase("Expense")) {
             rdoSortIncome_btn.setChecked(false);
             rdoSortExpense_btn.setChecked(true);
         }
-
 
 
         backBtn = (ImageView) root.findViewById(R.id.back_btn);
@@ -183,8 +183,9 @@ public class TransactionIncomeActivity extends Activity{
         addCategory_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AddCategoryDialog addCategoryDialog = new AddCategoryDialog(TransactionIncomeActivity.this,"Income");
+                AddCategoryDialog addCategoryDialog = new AddCategoryDialog(TransactionIncomeActivity.this, sortingType);
                 addCategoryDialog.LoadDialog();
+
             }
         });
 
@@ -201,29 +202,30 @@ public class TransactionIncomeActivity extends Activity{
         //check id from intent get exptra value
 
     }
-    String className = "";
-    public void loadCategory(String type){
 
-        categoryBeans = CategoryDB.getCatListWhere(sortingType);
-        listAdapter = new CategoryListAdapter(this.getActivity(),categoryBeans);
+    String className = "";
+
+    public void loadCategory(String type) {
+
+
+        categoryBeans = CategoryDB.getCatListWhere(type);
+        listAdapter = new CategoryListAdapter(this.getActivity(), categoryBeans);
         listAdapter.notifyDataSetChanged();
         category_spnr.setAdapter(listAdapter);
         String date = date_txt.getText().toString();
-        ArrayList<TransactionBeans> budgetBeansArrayList = transactionDB.getTransactionRecordsDate(date,sortingType);
-        transactionViewAdapter = new TransactionViewAdapter(this.getActivity(),budgetBeansArrayList,sortingType);
+        ArrayList<TransactionBeans> budgetBeansArrayList = transactionDB.getTransactionRecordsDate(date, type);
+        transactionViewAdapter = new TransactionViewAdapter(this.getActivity(), budgetBeansArrayList, type);
         budgetList.setAdapter(transactionViewAdapter);
     }
 
-    public Activity getActivity(){
+    public Activity getActivity() {
         return this;
     }
-    public void AdsInit(){
+
+    public void AdsInit() {
         mInterstitialAd = new InterstitialAd(this.getActivity());
-
         mInterstitialAd.setAdUnitId(getString(R.string.interstitial_full_screen));
-
         AdRequest adRequest = new AdRequest.Builder().build();
-
         // Load ads into Interstitial Ads
 //        if(Utilities.isLoadAdsWhenOpened) {
 //            mInterstitialAd.loadAd(adRequest);
@@ -231,7 +233,6 @@ public class TransactionIncomeActivity extends Activity{
 //                public void onAdLoaded() {
 //                    if (mInterstitialAd.isLoaded()) {
 //                        mInterstitialAd.show();
-//
 //                    }
 //                }
 //            });
@@ -239,18 +240,19 @@ public class TransactionIncomeActivity extends Activity{
         LoadBanner();
     }
 
-    public void LoadBanner(){
+    public void LoadBanner() {
         AdView mAdView = (AdView) root.findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
     }
+
     InterstitialAd mInterstitialAd;
 
 
+    Calendar calendar = null;
+    int year, month, dayOfMonth;
 
-Calendar calendar = null;
-    int year,month,dayOfMonth;
-    public void LoadDatePicker(){
+    public void LoadDatePicker() {
         calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
         month = calendar.get(Calendar.MONTH);
@@ -266,53 +268,56 @@ Calendar calendar = null;
         datePickerDialog.show();
     }
 
-    public void RefreshList(String name){
+    public void RefreshList(String name) {
         ArrayList<CATEGORY> categoryBeans = categoryDB.getCategoryRecords(sortingType);
-        listAdapter = new CategoryListAdapter(this.getActivity(),categoryBeans);
+        listAdapter = new CategoryListAdapter(this.getActivity(), categoryBeans);
         listAdapter.notifyDataSetChanged();
         category_spnr.setAdapter(listAdapter);
-        category_spnr.setSelection(getValuePosition(name,categoryBeans));
+        category_spnr.setSelection(getValuePosition(name, categoryBeans));
     }
 
-    public int getValuePosition(String name,ArrayList<CATEGORY> categoryBeans){
-        for(int index=0; index<categoryBeans.size(); index++){
+    public int getValuePosition(String name, ArrayList<CATEGORY> categoryBeans) {
+        for (int index = 0; index < categoryBeans.size(); index++) {
             CATEGORY beans = categoryBeans.get(index);
             String nameStr = beans.getName();
-            if(name.equalsIgnoreCase(nameStr)){
+            if (name.equalsIgnoreCase(nameStr)) {
                 return index;
             }
         }
         return -1;
     }
 
-    public void RefreshRecord(){
-        ArrayList<TransactionBeans> budgetBeansArrayList = transactionDB.getTransactionRecordsDate(date_txt.getText().toString(),sortingType);
-        transactionViewAdapter = new TransactionViewAdapter(TransactionIncomeActivity.this.getActivity(),budgetBeansArrayList,sortingType);
+    public void RefreshRecord() {
+        ArrayList<TransactionBeans> budgetBeansArrayList = transactionDB.getTransactionRecordsDate(date_txt.getText().toString(), sortingType);
+        transactionViewAdapter = new TransactionViewAdapter(TransactionIncomeActivity.this.getActivity(), budgetBeansArrayList, sortingType);
         budgetList.setAdapter(transactionViewAdapter);
     }
 
-    public void ShowRecordOFBudgetForUpdate(String id){
+    public void ShowRecordOFBudgetForUpdate(String id) {
         TransactionBeans budgetBeans = transactionDB.getTransactionRecordSingle(id);
-        if(budgetBeans!=null){
+        if (budgetBeans != null) {
             String cName = budgetBeans.getName();
             String date = budgetBeans.getDate();
             String description = budgetBeans.getDescription();
             String amount = budgetBeans.getBalance();
-            category_spnr.setSelection(Utilities.getIndexCategory(category_spnr,cName));
+            category_spnr.setSelection(Utilities.getIndexCategory(category_spnr, cName));
             budgetAmount_txt.setText(amount);
             description_txt.setText(description);
             date_txt.setText(date);
             selected_Id = id;
         }
     }
-    public void Refresh(){
-        selected_Id="";
+
+    public void Refresh() {
+        selected_Id = "";
         budgetAmount_txt.setText("");
     }
+
     String selected_Id = "";
-    public void SaveRecord(){
-        CATEGORY bean=(CATEGORY) category_spnr.getSelectedItem();
-        if(bean==null){
+
+    public void SaveRecord() {
+        CATEGORY bean = (CATEGORY) category_spnr.getSelectedItem();
+        if (bean == null) {
             Toast.makeText(this.getActivity(), "Category not created", Toast.LENGTH_LONG).show();
             return;
         }
@@ -320,12 +325,15 @@ Calendar calendar = null;
         String date = date_txt.getText().toString();
         String type = bean.getType();
         String amount = budgetAmount_txt.getText().toString();
-        if(amount.equalsIgnoreCase("")){
-            Toast.makeText(this.getActivity(),"Enter Amount greater then 0",Toast.LENGTH_LONG).show();
+        if (amount.equalsIgnoreCase("")) {
+            Toast.makeText(this.getActivity(), "Enter Amount greater then 0", Toast.LENGTH_LONG).show();
             return;
         }
         String description = description_txt.getText().toString();
-        if(selected_Id.equalsIgnoreCase("")) {
+        if (selected_Id.equalsIgnoreCase("")) {
+
+            int record = 0;
+            myDialog = ProgressDialog.show(this, "","Please Wait...", true);
             TransactionBeans transactionBeans = new TransactionBeans();
             transactionBeans.setCid(cid);
             transactionBeans.setDate(date);
@@ -334,19 +342,34 @@ Calendar calendar = null;
             transactionBeans.setIncome("0");
             transactionBeans.setExpense(amount);
             transactionBeans.setBalance(amount);
-            if(sortingType.equalsIgnoreCase("Income")){
+            if (sortingType.equalsIgnoreCase("Income")) {
                 transactionBeans.setIncome(amount);
                 transactionBeans.setExpense("0");
                 transactionBeans.setBalance(amount);
-                transactionDB.InsertRecord(transactionBeans);
-            }else if(sortingType.equalsIgnoreCase("Expense")){
+                record = transactionDB.InsertRecord(transactionBeans);
+                if(record > 0){
+                    TransactionDB.getTransactionList();
+                    myDialog.dismiss();
+                    Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
+                    loadCategory("Income");
+                }
+
+            } else if (sortingType.equalsIgnoreCase("Expense")) {
                 transactionBeans.setIncome("0");
                 transactionBeans.setExpense(amount);
                 transactionBeans.setBalance(amount);
-                transactionDB.InsertRecord(transactionBeans);
+                record = transactionDB.InsertRecord(transactionBeans);
+                if(record > 0){
+                    TransactionDB.getTransactionList();
+                    myDialog.dismiss();
+                    Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
+                    loadCategory("Expense");
+                }
             }
 
-        }else {
+        } else {
+            int record = 0;
+            myDialog = ProgressDialog.show(this, "","Please Wait...", true);
             String time = new SimpleDateFormat("hh:mm:ss").format(Calendar.getInstance().getTime());
             TransactionBeans transactionBeans = new TransactionBeans();
             transactionBeans.setCid(cid);
@@ -356,23 +379,33 @@ Calendar calendar = null;
             transactionBeans.setIncome("0");
             transactionBeans.setExpense(amount);
             transactionBeans.setBalance(amount);
-            if(sortingType.equalsIgnoreCase("Income")) {
+            if (sortingType.equalsIgnoreCase("Income")) {
                 transactionBeans.setIncome(amount);
                 transactionBeans.setExpense("0");
                 transactionBeans.setBalance(amount);
-                transactionDB.UpdateRecord(selected_Id,transactionBeans);
-            }else if(sortingType.equalsIgnoreCase("Expense")) {
+                record = transactionDB.UpdateRecord(selected_Id, transactionBeans);
+                if(record > 0){
+                    TransactionDB.getTransactionList();
+                    myDialog.dismiss();
+                    loadCategory("Income");
+                }
+            } else if (sortingType.equalsIgnoreCase("Expense")) {
                 transactionBeans.setIncome("0");
                 transactionBeans.setExpense(amount);
                 transactionBeans.setBalance(amount);
-                transactionDB.UpdateRecord(selected_Id, transactionBeans);
+                record = transactionDB.UpdateRecord(selected_Id, transactionBeans);
+                if(record > 0){
+                    TransactionDB.getTransactionList();
+                    myDialog.dismiss();
+                    loadCategory("Expense");
+                }
             }
-            selected_Id="";
+            selected_Id = "";
         }
-            Utilities.lastChanges = amount+"";
-            Utilities.lastType = sortingType;
-            Utilities.lastName = bean.getName();
-            Utilities.lastDate = date;
+        Utilities.lastChanges = amount + "";
+        Utilities.lastType = sortingType;
+        Utilities.lastName = bean.getName();
+        Utilities.lastDate = date;
 
         Utilities.hideKeyboardFrom(TransactionIncomeActivity.this.getActivity());
         RefreshRecord();
@@ -387,16 +420,17 @@ Calendar calendar = null;
         }
         return true;
     }
+
     @Override
     public void onBackPressed() {
         BackToMain();
 
     }
 
-    public void BackToMain(){
+    public void BackToMain() {
         Intent intent = null;
 //        if(clValue.equalsIgnoreCase("home")){
-            intent = new Intent(this, HomeActivity.class);
+        intent = new Intent(this, HomeActivity.class);
 //        }else if(clValue.equalsIgnoreCase("dailyTran")){
 //            intent = new Intent(this, DailyTransactionActivity.class);
 //        }

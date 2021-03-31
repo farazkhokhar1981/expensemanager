@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.widget.Toast;
 
+import androidx.annotation.BinderThread;
 import androidx.annotation.NonNull;
 
 import com.google.firebase.database.DataSnapshot;
@@ -19,8 +20,10 @@ import com.hrptech.expensemanager.localdb.db.GeneralDB;
 import com.hrptech.expensemanager.localdb.db.UtilitiesLocalDb;
 import com.hrptech.expensemanager.utility.Utilities;
 
+import java.net.BindException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Map;
 
 import static com.hrptech.expensemanager.localdb.db.UtilitiesLocalDb.transaction_id;
 
@@ -37,14 +40,71 @@ public class TransactionDB {
     }
 
 
+
+
+    public static void getTransactionList() {
+        //Utilities.catNameList.clear();
+        //GeneralDB.DeleteRecord(UtilitiesLocalDb.category_tbl);
+        DatabaseReference tranDB = FirebaseDatabase.getInstance().getReference("EXPENSEMANAGER/TRANSACTION");
+        tranDB.addValueEventListener(new ValueEventListener() {
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Utilities.TransactionList.removeAll(Utilities.TransactionList);
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    Map<String, Object> map = (Map<String, Object>) ds.getValue();
+
+                    String id = map.get("id").toString();
+                    String cid = map.get("cid").toString();
+                    String description = map.get("description").toString();
+                    String date = map.get("date").toString();
+                    String type = map.get("type").toString();
+                    String income = map.get("income").toString();
+                    String expense = map.get("expense").toString();
+                    String balance = map.get("balance").toString();
+
+                    if (!isTransactionExist(id, type)) {
+                        TransactionBeans transactionBeans = new TransactionBeans();
+                        transactionBeans.setId(id);
+                        transactionBeans.setCid(cid);
+                        transactionBeans.setDescription(description);
+                        transactionBeans.setDate(date);
+                        transactionBeans.setType(type);
+                        transactionBeans.setIncome(income);
+                        transactionBeans.setExpense(expense);
+                        transactionBeans.setBalance(balance);
+                        Utilities.TransactionList.add(transactionBeans);
+                    }
+                    //GeneralDB.InsertRecord(UtilitiesLocalDb.category_tbl, new String[]{UtilitiesLocalDb.category_id, UtilitiesLocalDb.category_name, UtilitiesLocalDb.category_type}, new String[]{id, name, type});
+                    //record++;
+                }
+            }
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+    public static boolean isTransactionExist(String id,String type){
+        for(int index = 0; index < Utilities.TransactionList.size(); index++){
+            TransactionBeans beans = Utilities.TransactionList.get(index);
+            String id_ = beans.getId();
+            String type_ = beans.getType();
+            if(id.equalsIgnoreCase(id_) && type.equalsIgnoreCase(type_)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public int InsertRecord(TransactionBeans transactionBeans) {
         int record = 0;
         try {
             String userId = databaseReference.push().getKey();
             transactionBeans.setId(userId);
             databaseReference.child(userId).setValue(transactionBeans);
+            TransactionBeans beans = null;
+            Utilities.TransactionList.add(transactionBeans);
             record = 1;
-            GeneralDB.InsertRecord(UtilitiesLocalDb.transaction_tbl, new String[]{UtilitiesLocalDb.transaction_id, UtilitiesLocalDb.transaction_category_id, UtilitiesLocalDb.transaction_date, UtilitiesLocalDb.transaction_type, UtilitiesLocalDb.transaction_description, UtilitiesLocalDb.transaction_income, UtilitiesLocalDb.transaction_expense, UtilitiesLocalDb.transaction_balance}, new String[]{userId, transactionBeans.getCid(), transactionBeans.getDate(), transactionBeans.getType(), transactionBeans.getDescription(), transactionBeans.getIncome(), transactionBeans.getExpense(), transactionBeans.getBalance()});
+
+            //GeneralDB.InsertRecord(UtilitiesLocalDb.transaction_tbl, new String[]{UtilitiesLocalDb.transaction_id, UtilitiesLocalDb.transaction_category_id, UtilitiesLocalDb.transaction_date, UtilitiesLocalDb.transaction_type, UtilitiesLocalDb.transaction_description, UtilitiesLocalDb.transaction_income, UtilitiesLocalDb.transaction_expense, UtilitiesLocalDb.transaction_balance}, new String[]{userId, transactionBeans.getCid(), transactionBeans.getDate(), transactionBeans.getType(), transactionBeans.getDescription(), transactionBeans.getIncome(), transactionBeans.getExpense(), transactionBeans.getBalance()});
         } catch (Exception e) {
             Toast.makeText(myActivity, "Error in inserting into table", Toast.LENGTH_LONG);
         }
@@ -65,7 +125,12 @@ public class TransactionDB {
             dbUpdateRecord.child(id).child("income").setValue(transactionBeans.getIncome());
             dbUpdateRecord.child(id).child("type").setValue(transactionBeans.getType());
 
-            GeneralDB.UpdateRecord(UtilitiesLocalDb.transaction_tbl, new String[]{UtilitiesLocalDb.transaction_id, UtilitiesLocalDb.transaction_category_id, UtilitiesLocalDb.transaction_date, UtilitiesLocalDb.transaction_type, UtilitiesLocalDb.transaction_description, UtilitiesLocalDb.transaction_income, UtilitiesLocalDb.transaction_expense, UtilitiesLocalDb.transaction_balance}, new String[]{transactionBeans.getId(), transactionBeans.getCid(), transactionBeans.getDate(), transactionBeans.getType(), transactionBeans.getDescription(), transactionBeans.getIncome(), transactionBeans.getExpense(), transactionBeans.getBalance()}, new String[]{transaction_id, transactionBeans.getId()});
+            for(int index = 0; index < Utilities.TransactionList.size(); index++){
+                if(Utilities.TransactionList.get(index).getId().equalsIgnoreCase(id)){
+                    Utilities.TransactionList.set(index,transactionBeans);
+                }
+            }
+            //GeneralDB.UpdateRecord(UtilitiesLocalDb.transaction_tbl, new String[]{UtilitiesLocalDb.transaction_id, UtilitiesLocalDb.transaction_category_id, UtilitiesLocalDb.transaction_date, UtilitiesLocalDb.transaction_type, UtilitiesLocalDb.transaction_description, UtilitiesLocalDb.transaction_income, UtilitiesLocalDb.transaction_expense, UtilitiesLocalDb.transaction_balance}, new String[]{transactionBeans.getId(), transactionBeans.getCid(), transactionBeans.getDate(), transactionBeans.getType(), transactionBeans.getDescription(), transactionBeans.getIncome(), transactionBeans.getExpense(), transactionBeans.getBalance()}, new String[]{transaction_id, transactionBeans.getId()});
             record = 1;
         } catch (Exception e) {
             Toast.makeText(myActivity, "Error in updating into table", Toast.LENGTH_LONG);
@@ -76,7 +141,12 @@ public class TransactionDB {
     public void DeleteRecord(String id) {
         try {
             databaseReference.child(id).removeValue();
-            GeneralDB.DeleteRecordWhere(UtilitiesLocalDb.transaction_tbl, UtilitiesLocalDb.transaction_id,id);
+            //GeneralDB.DeleteRecordWhere(UtilitiesLocalDb.transaction_tbl, UtilitiesLocalDb.transaction_id,id);
+            for(int index = 0; index < Utilities.TransactionList.size(); index++){
+                if(Utilities.TransactionList.get(index).getId().equalsIgnoreCase(id)){
+                    Utilities.TransactionList.remove(index);
+                }
+            }
         } catch (Exception e) {
             Toast.makeText(myActivity, "Error in deleting from table", Toast.LENGTH_LONG);
         }
@@ -85,21 +155,27 @@ public class TransactionDB {
     TransactionBeans bean;
     public TransactionBeans getTransactionRecordSingle(String id) {
 
-        ArrayList<String[]> recordList;
-        recordList = GeneralDB.getRecordsWhere(UtilitiesLocalDb.transaction_tbl, new String[]{UtilitiesLocalDb.transaction_id, UtilitiesLocalDb.transaction_category_id, UtilitiesLocalDb.transaction_date, UtilitiesLocalDb.transaction_type, UtilitiesLocalDb.transaction_description, UtilitiesLocalDb.transaction_income, UtilitiesLocalDb.transaction_expense, UtilitiesLocalDb.transaction_balance}, new String[]{transaction_id}, new String[]{id});
-        for (int index = 0; index < recordList.size(); index++) {
-            TransactionBeans transactionBeans = new TransactionBeans();
-
-            transactionBeans.setId(recordList.get(index)[0]);
-            transactionBeans.setCid(recordList.get(index)[1]);
-            transactionBeans.setDate(recordList.get(index)[2]);
-            transactionBeans.setType(recordList.get(index)[3]);
-            transactionBeans.setDescription(recordList.get(index)[4]);
-            transactionBeans.setIncome(recordList.get(index)[5]);
-            transactionBeans.setExpense(recordList.get(index)[6]);
-            transactionBeans.setBalance(recordList.get(index)[7]);
-            bean = transactionBeans;
+        for(int index = 0; index < Utilities.TransactionList.size(); index++){
+            TransactionBeans transactionBeans = Utilities.TransactionList.get(index);
+            String id_ = transactionBeans.getId();
+            if(id_.equalsIgnoreCase(id)){
+                bean = transactionBeans;
+            }
         }
+        //ArrayList<String[]> recordList;
+        //recordList = GeneralDB.getRecordsWhere(UtilitiesLocalDb.transaction_tbl, new String[]{UtilitiesLocalDb.transaction_id, UtilitiesLocalDb.transaction_category_id, UtilitiesLocalDb.transaction_date, UtilitiesLocalDb.transaction_type, UtilitiesLocalDb.transaction_description, UtilitiesLocalDb.transaction_income, UtilitiesLocalDb.transaction_expense, UtilitiesLocalDb.transaction_balance}, new String[]{transaction_id}, new String[]{id});
+//        for (int index = 0; index < recordList.size(); index++) {
+//            TransactionBeans transactionBeans = new TransactionBeans();
+//            transactionBeans.setId(recordList.get(index)[0]);
+//            transactionBeans.setCid(recordList.get(index)[1]);
+//            transactionBeans.setDate(recordList.get(index)[2]);
+//            transactionBeans.setType(recordList.get(index)[3]);
+//            transactionBeans.setDescription(recordList.get(index)[4]);
+//            transactionBeans.setIncome(recordList.get(index)[5]);
+//            transactionBeans.setExpense(recordList.get(index)[6]);
+//            transactionBeans.setBalance(recordList.get(index)[7]);
+//            bean = transactionBeans;
+//        }
         return bean;
     }
 
@@ -214,22 +290,22 @@ public class TransactionDB {
 
     public ArrayList<TransactionBeans> getTransactionRecordsDate(String date, String type) {
         ArrayList<TransactionBeans> beanList = new ArrayList<>();
-
-        ArrayList<String[]> recordList;
-        recordList = GeneralDB.getRecordsWhere(UtilitiesLocalDb.transaction_tbl, new String[]{UtilitiesLocalDb.transaction_id, UtilitiesLocalDb.transaction_category_id, UtilitiesLocalDb.transaction_date, UtilitiesLocalDb.transaction_type, UtilitiesLocalDb.transaction_description, UtilitiesLocalDb.transaction_income, UtilitiesLocalDb.transaction_expense, UtilitiesLocalDb.transaction_balance}, new String[]{UtilitiesLocalDb.transaction_date, UtilitiesLocalDb.transaction_type}, new String[]{date, type});
-        for (int index = 0; index < recordList.size(); index++) {
+        //ArrayList<String[]> recordList;
+        //recordList = GeneralDB.getRecordsWhere(UtilitiesLocalDb.transaction_tbl, new String[]{UtilitiesLocalDb.transaction_id, UtilitiesLocalDb.transaction_category_id, UtilitiesLocalDb.transaction_date, UtilitiesLocalDb.transaction_type, UtilitiesLocalDb.transaction_description, UtilitiesLocalDb.transaction_income, UtilitiesLocalDb.transaction_expense, UtilitiesLocalDb.transaction_balance}, new String[]{UtilitiesLocalDb.transaction_date, UtilitiesLocalDb.transaction_type}, new String[]{date, type});
+        for (int index = 0; index < Utilities.TransactionList.size(); index++) {
             TransactionBeans transactionBeans = new TransactionBeans();
+            if(Utilities.TransactionList.get(index).getDate().equalsIgnoreCase(date) && Utilities.TransactionList.get(index).getType().equalsIgnoreCase(type)){
+                transactionBeans.setId(Utilities.TransactionList.get(index).getId());
+                transactionBeans.setCid(Utilities.TransactionList.get(index).getCid());
+                transactionBeans.setDate(Utilities.TransactionList.get(index).getDate());
+                transactionBeans.setType(Utilities.TransactionList.get(index).getType());
+                transactionBeans.setDescription(Utilities.TransactionList.get(index).getDescription());
+                transactionBeans.setIncome(Utilities.TransactionList.get(index).getIncome());
+                transactionBeans.setExpense(Utilities.TransactionList.get(index).getExpense());
+                transactionBeans.setBalance(Utilities.TransactionList.get(index).getBalance());
 
-            transactionBeans.setId(recordList.get(index)[0]);
-            transactionBeans.setCid(recordList.get(index)[1]);
-            transactionBeans.setDate(recordList.get(index)[2]);
-            transactionBeans.setType(recordList.get(index)[3]);
-            transactionBeans.setDescription(recordList.get(index)[4]);
-            transactionBeans.setIncome(recordList.get(index)[5]);
-            transactionBeans.setExpense(recordList.get(index)[6]);
-            transactionBeans.setBalance(recordList.get(index)[7]);
-
-            beanList.add(transactionBeans);
+                beanList.add(transactionBeans);
+            }
 
         }
         return beanList;

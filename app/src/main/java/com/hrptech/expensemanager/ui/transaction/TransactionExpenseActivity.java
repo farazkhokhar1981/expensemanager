@@ -86,7 +86,7 @@ public class TransactionExpenseActivity extends Activity {
         budgetList.setLayoutManager(horizontalManager);
         String date = date_txt.getText().toString();
         ArrayList<TransactionBeans> budgetBeansArrayList = transactionDB.getTransactionRecordsDate(date,"Expense");
-        transactionViewAdapter = new TransactionViewAdapter(this.getActivity(),budgetBeansArrayList,"expense");
+        transactionViewAdapter = new TransactionViewAdapter(this.getActivity(),budgetBeansArrayList,"Expense");
         budgetList.setAdapter(transactionViewAdapter);
         saveBtn = (LinearLayout)root.findViewById(R.id.save_btn);
         saveBtn.setOnClickListener(new View.OnClickListener() {
@@ -256,11 +256,9 @@ Calendar calendar = null;
         transactionBeans.setBalance(amount);
         if(selected_Id.equalsIgnoreCase("")) {
 
-                Toast.makeText(this,"Worked for Insert...........",Toast.LENGTH_LONG).show();
                 transactionDB.InsertRecord(transactionBeans);
 
         }else {
-                Toast.makeText(this,"Worked for update...........",Toast.LENGTH_LONG).show();
                 transactionDB.UpdateRecord(selected_Id,transactionBeans);
 
             selected_Id="";

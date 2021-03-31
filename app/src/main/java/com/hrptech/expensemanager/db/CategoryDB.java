@@ -24,6 +24,8 @@ import com.hrptech.expensemanager.ui.category.CategoryActivity;
 import com.hrptech.expensemanager.ui.home.LoginActivity;
 import com.hrptech.expensemanager.utility.Utilities;
 
+import org.jsoup.helper.StringUtil;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -33,7 +35,7 @@ public class CategoryDB {
     CategoryDB categoryDB;
     static GeneralDB generalDB;
     Activity myActivity;
-    static  Activity myAct;
+    static Activity myAct;
     static ProgressDialog myDialog;
 
     static int record = 0;
@@ -50,13 +52,11 @@ public class CategoryDB {
         this.myAct = myActivity;
     }
 
-    public static void getCatNameListToLocalDB() {
-        //record = 0;
+    public static void getCatNameList() {
         //Utilities.catNameList.clear();
         //GeneralDB.DeleteRecord(UtilitiesLocalDb.category_tbl);
         DatabaseReference checkCatExist = FirebaseDatabase.getInstance().getReference("EXPENSEMANAGER/CATEGORY");
         checkCatExist.addValueEventListener(new ValueEventListener() {
-            @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Utilities.catNameList.removeAll(Utilities.catNameList);
                 for (DataSnapshot ds : snapshot.getChildren()) {
@@ -65,23 +65,20 @@ public class CategoryDB {
                     String type = map.get("type").toString();
                     String id = map.get("id").toString();
 
-                    if(!isNameExist(name,type)){
+                    if (!isNameExist(name, type)) {
                         CATEGORY category = new CATEGORY();
                         category.setId(id);
                         category.setType(type);
                         category.setName(name);
                         Utilities.catNameList.add(category);
                     }
-
                     //GeneralDB.InsertRecord(UtilitiesLocalDb.category_tbl, new String[]{UtilitiesLocalDb.category_id, UtilitiesLocalDb.category_name, UtilitiesLocalDb.category_type}, new String[]{id, name, type});
                     //record++;
                 }
             }
-            @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
-        //return record;
     }
 
     public static ArrayList<CATEGORY> getCatList() {
@@ -99,18 +96,33 @@ public class CategoryDB {
     }
 
     public static ArrayList<CATEGORY> getCatListWhere(String catType) {
-        Utilities.catNameList.clear();
-        ArrayList<String[]> recordList;
-        recordList = GeneralDB.getRecordsWhere(UtilitiesLocalDb.category_tbl, new String[]{UtilitiesLocalDb.category_id, UtilitiesLocalDb.category_name, UtilitiesLocalDb.category_type},new String[]{UtilitiesLocalDb.category_type},new String[]{catType});
+        //Utilities.catNameList.clear();
+        //ArrayList<String[]> recordList;
+        //recordList = GeneralDB.getRecordsWhere(UtilitiesLocalDb.category_tbl, new String[]{UtilitiesLocalDb.category_id, UtilitiesLocalDb.category_name, UtilitiesLocalDb.category_type},new String[]{UtilitiesLocalDb.category_type},new String[]{catType});
 
-        for (int index = 0; index < recordList.size(); index++) {
-            CATEGORY category = new CATEGORY();
-            category.setId(recordList.get(index)[0]);
-            category.setName(recordList.get(index)[1]);
-            category.setType(recordList.get(index)[2]);
-            Utilities.catNameList.add(category);
+        ArrayList<CATEGORY> catList = new ArrayList<>();
+        for (int index = 0; index <= Utilities.catNameList.size()-1; index++) {
+            if(Utilities.catNameList.get(index).getType().equalsIgnoreCase(catType)){
+
+                CATEGORY beans = new CATEGORY();
+
+                beans.setId(Utilities.catNameList.get(index).getId());
+                beans.setName(Utilities.catNameList.get(index).getName());
+                beans.setType(Utilities.catNameList.get(index).getType());
+
+                catList.add(beans);
+            }
         }
-        return Utilities.catNameList;
+
+
+//        for (int index = 0; index < recordList.size(); index++) {
+//            CATEGORY category = new CATEGORY();
+//            category.setId(recordList.get(index)[0]);
+//            category.setName(recordList.get(index)[1]);
+//            category.setType(recordList.get(index)[2]);
+//            Utilities.catNameList.add(category);
+//        }
+        return catList;
     }
 
 
@@ -143,6 +155,24 @@ public class CategoryDB {
         return record;
     }
 
+    public int InsertRecordDialog(CATEGORY category) {
+        record = 0;
+        String enteredCatName = category.getName();
+        String enteredCatType = category.getType();
+        try {
+            if (!isNameExist(enteredCatName, enteredCatType)) {
+                String userId = databaseReference.push().getKey();
+                category.setId(userId);
+                databaseReference.child(userId).setValue(category);
+                record = 1;
+                Utilities.catNameList.add(category);
+            }
+        } catch (Exception e) {
+            Toast.makeText(myActivity, "Error in inserting into table", Toast.LENGTH_LONG);
+        }
+        return record;
+    }
+
     public int UpdateRecord(String userId, CATEGORY category) {
         record = 0;
         try {
@@ -167,7 +197,22 @@ public class CategoryDB {
     }
 
     public ArrayList<CATEGORY> getCategoryRecords(String types) {
-       return Utilities.catNameList;
+
+        ArrayList<CATEGORY> catList = new ArrayList<>();
+
+        for(int index = 0; index < Utilities.catNameList.size(); index++){
+            if(Utilities.catNameList.get(index).getType().equalsIgnoreCase(types)){
+                CATEGORY bean = new CATEGORY();
+
+                bean.setId(Utilities.catNameList.get(index).getId());
+                bean.setName(Utilities.catNameList.get(index).getName());
+                bean.setType(Utilities.catNameList.get(index).getType());
+
+                catList.add(bean);
+            }
+        }
+
+        return catList;
     }
 
     public boolean isCategoryExist(String name) {

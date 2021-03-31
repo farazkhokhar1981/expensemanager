@@ -6,13 +6,11 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -41,12 +39,10 @@ import com.hrptech.expensemanager.beans.CATEGORY;
 import com.hrptech.expensemanager.beans.TransactionBeans;
 import com.hrptech.expensemanager.db.CategoryDB;
 import com.hrptech.expensemanager.db.SettingDB;
-import com.hrptech.expensemanager.db.TransactionDB;
-import com.hrptech.expensemanager.localdb.db.GeneralDB;
-import com.hrptech.expensemanager.localdb.db.UtilitiesLocalDb;
 import com.hrptech.expensemanager.ui.backup.BackupRestoreFragment;
 import com.hrptech.expensemanager.ui.budget.BudgetFragment;
 import com.hrptech.expensemanager.ui.category.CategoryActivity;
+import com.hrptech.expensemanager.ui.category.CategoryViewAdapter;
 import com.hrptech.expensemanager.ui.dailytran.DailyTransactionActivity;
 import com.hrptech.expensemanager.ui.home.HomeActivity;
 import com.hrptech.expensemanager.ui.report.PDFViewPageVoucherDetail;
@@ -68,6 +64,8 @@ import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
+import static androidx.core.content.ContextCompat.startActivity;
 
 public class Utilities {
     public static boolean isLoadAdsWhenOpened = true;
@@ -134,6 +132,7 @@ public class Utilities {
     public static String lastName = "";
     public static String lastDate = "";
     public static ArrayList<CATEGORY> catNameList = new ArrayList<>();
+    public static ArrayList<TransactionBeans> TransactionList = new ArrayList<>();
 
 
 
@@ -176,7 +175,7 @@ public class Utilities {
                     categoryFragment.categoryDB.DeleteRecord(id);
                     //GeneralDB.DeleteRecordWhere(UtilitiesLocalDb.category_tbl,UtilitiesLocalDb.category_id,id);
                     //Utilities.catNameList = CategoryDB.getCatList();
-                    CategoryDB.getCatNameListToLocalDB();
+                    CategoryDB.getCatNameList();
                     for(int index = 0; index < Utilities.catNameList.size(); index++){
                         if(Utilities.catNameList.get(index).getId().equalsIgnoreCase(id)){
                             Utilities.catNameList.remove(index);
@@ -276,7 +275,7 @@ public class Utilities {
     }
 
 
-    public static void showIncomeActivityDialogTransaction(final TransactionIncomeActivity transactionFragment, final String id, final String cid, Activity activity, final String type, String msg1, String msg2){
+    public static void showIncomeActivityDialogTransaction(final TransactionIncomeActivity transactionFragment, final String id, Activity activity, final String type, String msg1, String msg2){
         final Dialog dialog = new Dialog(activity);
         dialog.setContentView(R.layout.alertdialog);
 
@@ -289,9 +288,23 @@ public class Utilities {
         dialogButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String catName = "";
                 if(type.equalsIgnoreCase("delete")){
-                    transactionFragment.transactionDB.DeleteRecord(id);
-                    transactionFragment.RefreshRecord();
+                    transactionFragment.categoryDB.DeleteRecord(id);
+                    for(int index = 0; index < Utilities.catNameList.size(); index++){
+                        if(index == 0){
+                            catName = Utilities.catNameList.get(index).getName();
+                        }
+                        if(Utilities.catNameList.get(index).getId().equalsIgnoreCase(id)){
+                            Utilities.catNameList.remove(index);
+                        }
+                    }
+                    //Toast.makeText(activity.class,"ojjoj",Toast.LENGTH_LONG).show();
+                    if(TransactionIncomeActivity.getTransactionFragment()!=null){
+                        TransactionIncomeActivity.getTransactionFragment().RefreshList(catName);
+                    }
+                    AddCategoryDialog.LoadDialog();
+                    //transactionFragment.RefreshRecord();
                     dialog.dismiss();
                 }else {
                     transactionFragment.SaveRecord();

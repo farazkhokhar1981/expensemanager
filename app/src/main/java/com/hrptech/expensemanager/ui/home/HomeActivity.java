@@ -1,6 +1,8 @@
 package com.hrptech.expensemanager.ui.home;
 
 import android.app.Activity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -8,7 +10,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.renderscript.Sampler;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.view.MenuItem;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.view.ContextThemeWrapper;
+import androidx.core.app.NotificationCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,14 +41,16 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.hrptech.expensemanager.R;
 import com.hrptech.expensemanager.SettingsActivity;
-import com.hrptech.expensemanager.beans.CATEGORY;
 import com.hrptech.expensemanager.beans.SettingBeans;
 import com.hrptech.expensemanager.beans.TransactionBeans;
 import com.hrptech.expensemanager.chart.RoundedSlicesPieChartRenderer;
@@ -56,7 +60,6 @@ import com.hrptech.expensemanager.db.TransactionDB;
 import com.hrptech.expensemanager.listviewitems.ChartItem;
 import com.hrptech.expensemanager.listviewitems.PieChartItem;
 import com.hrptech.expensemanager.localdb.db.GeneralDB;
-import com.hrptech.expensemanager.localdb.db.UtilitiesLocalDb;
 import com.hrptech.expensemanager.ui.budget.BudgetFragment;
 import com.hrptech.expensemanager.ui.category.CategoryActivity;
 import com.hrptech.expensemanager.ui.transaction.TransactionIncomeActivity;
@@ -104,13 +107,30 @@ public class HomeActivity extends Activity {
         setContentView(R.layout.fragment_home);
         // initialiaze all objects here
 
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel notificationChannel = new
+                    NotificationChannel("MyNotifications","MyNotifications", NotificationManager.IMPORTANCE_DEFAULT);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+
+        FirebaseMessaging.getInstance().subscribeToTopic("general")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        String msg = "Success";
+                        if (!task.isSuccessful()) {
+                            msg = "Error";
+                        }
+                        Toast.makeText(HomeActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
         GeneralDB generalDB = new GeneralDB(this);
-
-
-
-        CategoryDB.getCatNameListToLocalDB();
-
-
+        CategoryDB.getCatNameList();
+        TransactionDB.getTransactionList();
 
         testReference = FirebaseDatabase.getInstance().getReference().child("Score");
         testReference.addValueEventListener(new ValueEventListener() {
