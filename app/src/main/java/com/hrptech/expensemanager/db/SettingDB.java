@@ -90,18 +90,14 @@ public class SettingDB {
     }
     SettingBeans bean=null;
     public SettingBeans getSettingRecordsSingle(){
-
         try {
-
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     bean = dataSnapshot.getValue(SettingBeans.class);
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
                 }
             });
         } catch (Exception e) {
@@ -109,5 +105,9 @@ public class SettingDB {
         }
         return bean;
     }
+
+
+
+
 
 }

@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -49,6 +50,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.hookedonplay.decoviewlib.DecoView;
+import com.hookedonplay.decoviewlib.charts.EdgeDetail;
+import com.hookedonplay.decoviewlib.charts.SeriesItem;
+import com.hookedonplay.decoviewlib.charts.SeriesLabel;
+import com.hookedonplay.decoviewlib.events.DecoEvent;
 import com.hrptech.expensemanager.R;
 import com.hrptech.expensemanager.SettingsActivity;
 import com.hrptech.expensemanager.beans.SettingBeans;
@@ -74,8 +80,9 @@ import java.util.Map;
 
 public class HomeActivity extends Activity {
 
-    DatabaseReference testReference;
+    DatabaseReference getTotalIncomeExpense;
 
+    String  selectedDateFormat = "";
 
     LinearLayout chart_id = null;
     LinearLayout budget_lay = null;
@@ -94,10 +101,11 @@ public class HomeActivity extends Activity {
     SettingDB settingDB;
     private BudgetViewAdapter budgetViewAdapter = null;
     private ListView listView = null;
+    public static String currency = "";
     String months[] = {"Jan", "Feb", "Mar", "Apr",
             "May", "Jun", "Jul", "Aug",
             "Sep", "Oct", "Nov", "Dec"};
-    String currency = "";
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,57 +115,49 @@ public class HomeActivity extends Activity {
         setContentView(R.layout.fragment_home);
         // initialiaze all objects here
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel notificationChannel = new
-                    NotificationChannel("MyNotifications","MyNotifications", NotificationManager.IMPORTANCE_DEFAULT);
+        //// Setting Currency & date formate!
+//        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+//        DatabaseReference ref = database.getReference("EXPENSEMANAGER/SETTINGS");
+//        ref.addValueEventListener(new ValueEventListener() {
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                SettingBeans beans = dataSnapshot.getValue(SettingBeans.class);
+//                currency = beans.getCurrency();
+//                Toast.makeText(HomeActivity.this,"Currency: "+currency ,Toast.LENGTH_LONG).show();
+//                selectedDateFormat = beans.getDateformat();
+//            }
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//            }
+//        });
+        //// -------------------------------
 
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(notificationChannel);
-        }
-
-        FirebaseMessaging.getInstance().subscribeToTopic("general")
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        String msg = "Success";
-                        if (!task.isSuccessful()) {
-                            msg = "Error";
-                        }
-                        Toast.makeText(HomeActivity.this, msg, Toast.LENGTH_SHORT).show();
-                    }
-                });
-
+        decoViewCircle();
+        notification();
 
         GeneralDB generalDB = new GeneralDB(this);
         CategoryDB.getCatNameList();
         TransactionDB.getTransactionList();
 
-        testReference = FirebaseDatabase.getInstance().getReference().child("Score");
-        testReference.addValueEventListener(new ValueEventListener() {
+        getTotalIncomeExpense = FirebaseDatabase.getInstance().getReference().child("EXPENSEMANAGER/TRANSACTION");
+        getTotalIncomeExpense.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                int sum = 0;
+                int income = 0;
+                int expense = 0;
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     Map<String, Object> map = (Map<String, Object>) ds.getValue();
-                    Object value = map.get("Value");
-                    int pValue = Integer.parseInt(String.valueOf(value));
-                    sum += pValue;
-                    balance_txt.setText(String.valueOf(sum));
+                    String income_ = map.get("income").toString();
+                    String expense_ = map.get("expense").toString();
+                    income += Integer.parseInt(income_);
+                    expense += Integer.parseInt(expense_);
+                    income_txt.setText(currency+""+income);
+                    expense_txt.setText(currency+""+expense);
+                    balance_txt.setText(currency+""+(income-expense));
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
-
-
-//        Utilities.catNameList = CategoryDB.getCatList();
-//        int x = 0;
-//        x = Utilities.catNameList.size();
-
-
-        // expense_txt.setText(String.valueOf(x));
 
         init();
 
@@ -217,8 +217,13 @@ public class HomeActivity extends Activity {
         String year = new SimpleDateFormat("yyyy").format(new Date());
         String month = months[Integer.parseInt(new SimpleDateFormat("MM").format(new Date())) - 1];
         String month_ = Utilities.getMonth(months, month);
+//        Toast.makeText(this,"Year:  "+year,Toast.LENGTH_LONG).show();
+//        Toast.makeText(this,"DATE:  "+month,Toast.LENGTH_LONG).show();
+//        Toast.makeText(this,"DATE_:   "+month_,Toast.LENGTH_LONG).show();
+
         TransactionBeans beansTransaction = transactionDB.getTransactionRecordsYear(month_, year);
         if (beansTransaction != null) {
+            Toast.makeText(this,"Hello",Toast.LENGTH_LONG).show();
             income_txt.setText(currency + "" + beansTransaction.getIncome());
             expense_txt.setText(currency + "" + beansTransaction.getExpense());
             balance_txt.setText(currency + "" + beansTransaction.getBalance());
@@ -244,6 +249,45 @@ public class HomeActivity extends Activity {
         ChartTransaction();
     }
 
+    private void decoViewCircle() {
+        DecoView decoView = (DecoView) findViewById(R.id.dynamicArcView);
+        final SeriesItem seriesItem = new SeriesItem.Builder(Color.parseColor("#0550F3"))
+                .setRange(24, 100, 100)
+                .setSeriesLabel(new SeriesLabel.Builder(" \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 DEC")
+                        .setColorBack(Color.argb(0, 0, 0, 0))
+                        .setColorText(Color.argb(255, 0, 0, 0))
+                        .setFontSize(16)
+                        .build())
+                .build();
+        int series1Index = decoView.addSeries(seriesItem);
+
+        SeriesItem seriesItem1 = new SeriesItem.Builder(Color.rgb(190, 224, 252))
+                .setRange(0, 100, 20)
+                .addEdgeDetail(new EdgeDetail(EdgeDetail.EdgeType.EDGE_OUTER, Color.parseColor("#22000000"), 0.1f))
+                .build();
+        int series2index = decoView.addSeries(seriesItem1);
+    }
+
+    private void notification() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new
+                    NotificationChannel("MyNotifications", "MyNotifications", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+        FirebaseMessaging.getInstance().subscribeToTopic("general")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        String msg = "Success";
+                        if (!task.isSuccessful()) {
+                            msg = "Error";
+                        }
+                        //Toast.makeText(HomeActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
 
     public void init() {
         settings_btn = (ImageView) findViewById(R.id.settings_btn);
@@ -256,22 +300,14 @@ public class HomeActivity extends Activity {
         amount_txt = (TextView) findViewById(R.id.amount_txt);
 //        chart_id = (LinearLayout)findViewById(R.id.chart_id);
         listView = (ListView) findViewById(R.id.listView1);
-        listView.setAdapter(null);
+        //listView.setAdapter(null);
         budget_lay = (LinearLayout) findViewById(R.id.budget_lay);
         transactionDB = new TransactionDB(this);
         categoryDB = new CategoryDB(this);
-        settingDB = new SettingDB(this);
-        settingBeans = settingDB.getSettingRecordsSingle();
-        if (settingBeans != null) {
-            currency = settingBeans.getCurrency();
-        } else {
-            settingBeans = new SettingBeans();
-            settingBeans.setLanguge("en");
-            settingBeans.setCurrency("$");
-            settingBeans.setDateformat("yyyy-MM-dd");
-            settingDB.InsertRecord(settingBeans);
-            currency = "$";
-        }
+
+
+
+
         budgetList = (RecyclerView) findViewById(R.id.mRecyclerView);
         budgetList.setHasFixedSize(true);
         LinearLayoutManager budgetManager = new LinearLayoutManager(this.getActivity(), LinearLayoutManager.VERTICAL, false);
@@ -374,7 +410,7 @@ public class HomeActivity extends Activity {
 
 
         ChartDataAdapter cda = new ChartDataAdapter(this.getActivity(), list);
-        listView.setAdapter(cda);
+        //listView.setAdapter(cda);
     }
 
     private LineData generateDataLine() {
